@@ -1,6 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
 export const Hero: React.FC = () => {
   return (
@@ -38,24 +37,6 @@ export const Hero: React.FC = () => {
           <p className="text-base sm:text-lg text-gray-300 font-normal leading-relaxed mb-10 max-w-xl">
             Our coworking spaces let you choose to work with others in an open-plan area, or a shared office. Designed for tech innovators, agency teams, and creators in Blue Area, Islamabad.
           </p>
-
-          {/* Action Buttons from Design.png */}
-          <div className="flex flex-wrap items-center gap-4">
-            <a
-              href="#book-tour"
-              className="px-8 py-4 bg-[#00B87C] hover:bg-[#009F6B] text-white font-bold text-sm tracking-wider uppercase rounded-md shadow-xl shadow-[#00B87C]/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 inline-flex items-center gap-2"
-            >
-              <span>BOOK A TOUR</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
-
-            <Link
-              to="/about"
-              className="px-8 py-4 bg-[#1F2937]/80 hover:bg-[#374151] text-white font-semibold text-sm rounded-md border border-white/20 transition-all transform hover:-translate-y-0.5"
-            >
-              About Us
-            </Link>
-          </div>
 
           {/* Trust Highlights */}
           <div className="mt-12 pt-8 border-t border-white/10 flex flex-wrap items-center gap-6 text-xs text-gray-400">
