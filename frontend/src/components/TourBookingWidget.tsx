@@ -11,6 +11,27 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
+const getLocalDate = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const availableTourTimes = Array.from({ length: 11 }, (_, index) => {
+  const hour = index + 9;
+  const period = hour < 12 ? 'AM' : 'PM';
+  const displayHour = hour % 12 || 12;
+  return {
+    value: `${String(hour).padStart(2, '0')}:00`,
+    label: `${displayHour}:00 ${period}`,
+  };
+});
+
+type TourFormField = 'fullName' | 'email' | 'startDate' | 'endDate' | 'preferredTime' | 'terms';
+type TourFormErrors = Partial<Record<TourFormField, string>>;
+
 export const TourBookingWidget: React.FC = () => {
   const { showToast } = useToast();
   const [email, setEmail] = useState('');
@@ -18,17 +39,57 @@ export const TourBookingWidget: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [bookingType, setBookingType] = useState('Personal');
   const [planInterest, setPlanInterest] = useState('Hot Desk');
-  const [startDate, setStartDate] = useState('2026-10-25');
-  const [endDate, setEndDate] = useState('2026-11-25');
-  const [preferredTime, setPreferredTime] = useState('10:00');
+  const [startDate, setStartDate] = useState(getLocalDate);
+  const [endDate, setEndDate] = useState(getLocalDate);
+  const [preferredTime, setPreferredTime] = useState('');
+  const [formErrors, setFormErrors] = useState<TourFormErrors>({});
   const [agreed, setAgreed] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [whatsappLink, setWhatsappLink] = useState<string | null>(null);
 
+  const clearError = (field: TourFormField) => {
+    setFormErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const today = getLocalDate();
+    const errors: TourFormErrors = {};
+
+    if (fullName.trim().length < 2) {
+      errors.fullName = 'Please enter your full name.';
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      errors.email = 'Please enter a valid email address.';
+    }
+    if (!startDate) {
+      errors.startDate = 'Please select a start date.';
+    } else if (startDate < today) {
+      errors.startDate = 'Please choose today or a future date.';
+    }
+    if (!endDate) {
+      errors.endDate = 'Please select an end date.';
+    } else if (endDate < today) {
+      errors.endDate = 'Please choose today or a future date.';
+    } else if (startDate && endDate < startDate) {
+      errors.endDate = 'End date must be on or after the start date.';
+    }
+    if (!preferredTime) {
+      errors.preferredTime = 'Please select an available tour time.';
+    }
     if (!agreed) {
-      showToast('Please accept the Terms of Service to book a tour.', 'error');
+      errors.terms = 'Please accept the terms to request a tour.';
+    }
+
+    setFormErrors(errors);
+    const firstError = Object.values(errors)[0];
+    if (firstError) {
+      showToast(firstError, 'error');
       return;
     }
 
@@ -42,10 +103,7 @@ export const TourBookingWidget: React.FC = () => {
         plan_interest: planInterest,
         start_date: startDate,
         end_date: endDate,
-        preferred_time: new Date(`1970-01-01T${preferredTime}:00`).toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-        }),
+        preferred_time: availableTourTimes.find((time) => time.value === preferredTime)?.label,
         terms_agreed: agreed,
       });
 
@@ -128,7 +186,7 @@ export const TourBookingWidget: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} noValidate className="space-y-5">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label htmlFor="tour-name" className="mb-2 block text-sm font-medium text-gray-700">
@@ -141,9 +199,15 @@ export const TourBookingWidget: React.FC = () => {
                       required
                       placeholder="e.g. Ayesha Khan"
                       value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                      onChange={(e) => {
+                        setFullName(e.target.value);
+                        clearError('fullName');
+                      }}
+                      aria-invalid={!!formErrors.fullName}
+                      aria-describedby={formErrors.fullName ? 'tour-name-error' : undefined}
+                      className={`h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition focus:ring-2 focus:ring-[#00A875]/10 ${formErrors.fullName ? 'border-red-500' : 'border-gray-200 focus:border-[#00A875]'}`}
                     />
+                    {formErrors.fullName && <p id="tour-name-error" role="alert" className="mt-1.5 text-xs text-red-600">{formErrors.fullName}</p>}
                   </div>
                   <div>
                     <label htmlFor="tour-phone" className="mb-2 block text-sm font-medium text-gray-700">
@@ -172,9 +236,15 @@ export const TourBookingWidget: React.FC = () => {
                     required
                     placeholder="you@company.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      clearError('email');
+                    }}
+                    aria-invalid={!!formErrors.email}
+                    aria-describedby={formErrors.email ? 'tour-email-error' : undefined}
+                    className={`h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition focus:ring-2 focus:ring-[#00A875]/10 ${formErrors.email ? 'border-red-500' : 'border-gray-200 focus:border-[#00A875]'}`}
                   />
+                  {formErrors.email && <p id="tour-email-error" role="alert" className="mt-1.5 text-xs text-red-600">{formErrors.email}</p>}
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -227,10 +297,27 @@ export const TourBookingWidget: React.FC = () => {
                       <input
                         id="tour-start-date"
                         type="date"
+                        min={getLocalDate()}
                         value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="h-11 w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setStartDate(value);
+                          if (value && value < getLocalDate()) {
+                            setFormErrors((current) => ({ ...current, startDate: 'Please choose today or a future date.' }));
+                          } else {
+                            clearError('startDate');
+                            if (endDate && value && endDate < value) {
+                              setFormErrors((current) => ({ ...current, endDate: 'End date must be on or after the start date.' }));
+                            } else {
+                              clearError('endDate');
+                            }
+                          }
+                        }}
+                        aria-invalid={!!formErrors.startDate}
+                        aria-describedby={formErrors.startDate ? 'tour-start-date-error' : undefined}
+                        className={`h-11 w-full min-w-0 rounded-lg border bg-white px-3 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[#00A875]/10 ${formErrors.startDate ? 'border-red-500' : 'border-gray-200 focus:border-[#00A875]'}`}
                       />
+                      {formErrors.startDate && <p id="tour-start-date-error" role="alert" className="mt-1.5 text-xs text-red-600">{formErrors.startDate}</p>}
                     </div>
                     <div>
                       <label htmlFor="tour-end-date" className="mb-2 block text-xs font-semibold text-gray-600">
@@ -239,25 +326,46 @@ export const TourBookingWidget: React.FC = () => {
                       <input
                         id="tour-end-date"
                         type="date"
+                        min={startDate || getLocalDate()}
                         value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        className="h-11 w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setEndDate(value);
+                          if (value && value < getLocalDate()) {
+                            setFormErrors((current) => ({ ...current, endDate: 'Please choose today or a future date.' }));
+                          } else if (value && startDate && value < startDate) {
+                            setFormErrors((current) => ({ ...current, endDate: 'End date must be on or after the start date.' }));
+                          } else {
+                            clearError('endDate');
+                          }
+                        }}
+                        aria-invalid={!!formErrors.endDate}
+                        aria-describedby={formErrors.endDate ? 'tour-end-date-error' : undefined}
+                        className={`h-11 w-full min-w-0 rounded-lg border bg-white px-3 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[#00A875]/10 ${formErrors.endDate ? 'border-red-500' : 'border-gray-200 focus:border-[#00A875]'}`}
                       />
+                      {formErrors.endDate && <p id="tour-end-date-error" role="alert" className="mt-1.5 text-xs text-red-600">{formErrors.endDate}</p>}
                     </div>
                     <div>
                       <label htmlFor="tour-time" className="mb-2 block text-xs font-semibold text-gray-600">
                         Preferred time
                       </label>
-                      <input
+                      <select
                         id="tour-time"
-                        type="time"
-                        min="09:00"
-                        max="19:00"
-                        required
                         value={preferredTime}
-                        onChange={(e) => setPreferredTime(e.target.value)}
-                        className="h-11 w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
-                      />
+                        onChange={(e) => {
+                          setPreferredTime(e.target.value);
+                          clearError('preferredTime');
+                        }}
+                        aria-invalid={!!formErrors.preferredTime}
+                        aria-describedby={formErrors.preferredTime ? 'tour-time-error' : undefined}
+                        className={`h-11 w-full min-w-0 rounded-lg border bg-white px-3 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[#00A875]/10 ${formErrors.preferredTime ? 'border-red-500' : 'border-gray-200 focus:border-[#00A875]'}`}
+                      >
+                        <option value="">Select a time</option>
+                        {availableTourTimes.map((time) => (
+                          <option key={time.value} value={time.value}>{time.label}</option>
+                        ))}
+                      </select>
+                      {formErrors.preferredTime && <p id="tour-time-error" role="alert" className="mt-1.5 text-xs text-red-600">{formErrors.preferredTime}</p>}
                     </div>
                   </div>
                 </div>
@@ -267,13 +375,19 @@ export const TourBookingWidget: React.FC = () => {
                     type="checkbox"
                     id="terms"
                     checked={agreed}
-                    onChange={(e) => setAgreed(e.target.checked)}
+                    onChange={(e) => {
+                      setAgreed(e.target.checked);
+                      clearError('terms');
+                    }}
                     className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-gray-300 text-[#00A875] focus:ring-[#00B87C]"
+                    aria-invalid={!!formErrors.terms}
+                    aria-describedby={formErrors.terms ? 'tour-terms-error' : undefined}
                   />
                   <label htmlFor="terms" className="cursor-pointer text-xs leading-5 text-gray-500">
                     I agree to The Roarworks' terms of service and privacy policy.
                   </label>
                 </div>
+                {formErrors.terms && <p id="tour-terms-error" role="alert" className="text-xs text-red-600">{formErrors.terms}</p>}
 
                 <button
                   type="submit"
