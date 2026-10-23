@@ -14,7 +14,6 @@ export const Navbar: React.FC = () => {
     { name: 'Partnerships', path: '/partnerships' },
     { name: 'Team', path: '/team' },
     { name: 'Blog', path: '/blog' },
-    { name: 'Location & Contact', path: '/contact' },
   ];
 
   const isActive = (path: string) => {
