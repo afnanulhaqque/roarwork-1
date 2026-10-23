@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { bookingsApi } from '../services/api';
 import { useToast } from '../context/ToastContext';
-import { Check, Calendar, Mail, User, Layers, MessageSquare, ExternalLink } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  Clock3,
+  ExternalLink,
+  MapPin,
+  MessageSquare,
+  ShieldCheck,
+} from 'lucide-react';
 
 export const TourBookingWidget: React.FC = () => {
   const { showToast } = useToast();
@@ -12,6 +20,7 @@ export const TourBookingWidget: React.FC = () => {
   const [planInterest, setPlanInterest] = useState('Hot Desk');
   const [startDate, setStartDate] = useState('2026-10-25');
   const [endDate, setEndDate] = useState('2026-11-25');
+  const [preferredTime, setPreferredTime] = useState('10:00');
   const [agreed, setAgreed] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [whatsappLink, setWhatsappLink] = useState<string | null>(null);
@@ -33,7 +42,10 @@ export const TourBookingWidget: React.FC = () => {
         plan_interest: planInterest,
         start_date: startDate,
         end_date: endDate,
-        preferred_time: 'Day Shift',
+        preferred_time: new Date(`1970-01-01T${preferredTime}:00`).toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+        }),
         terms_agreed: agreed,
       });
 
@@ -53,72 +65,55 @@ export const TourBookingWidget: React.FC = () => {
   };
 
   return (
-    <section id="book-tour" className="relative py-24 bg-[#F3F8F6] overflow-hidden">
-      {/* Background Image of Coworkers at Desks matching Design.png */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center opacity-10"
-        style={{
-          backgroundImage: `url('/booking_tour.jpeg')`,
-        }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#F3F8F6]/95 via-[#F3F8F6]/90 to-[#F3F8F6]/95" />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-          
-          {/* Left Side: Teaser Text */}
-          <div className="max-w-xl text-gray-900">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00B87C]/20 text-[#00B87C] text-xs font-semibold uppercase tracking-wider mb-4 border border-[#00B87C]/30">
-              Personalized Workspace Tour
-            </div>
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-6">
-              Experience The Roarworks in Person.
-            </h2>
-            <p className="text-gray-600 text-sm sm:text-base leading-relaxed mb-8">
-              Tour our flexible hot desks, executive conference rooms, soundproof podcast studio, and member lounge in Blue Area, Islamabad. Free day pass provided with every guided tour.
+    <section id="book-tour" className="bg-white py-16 sm:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="grid items-start gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20">
+          <div className="pt-2 text-gray-900 lg:sticky lg:top-28">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#008b60]">
+              Visit The Roarworks
             </p>
-            <div className="space-y-3 text-sm text-gray-700">
-              <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#00B87C]/20 flex items-center justify-center text-[#00B87C]">
-                  <Check className="w-3.5 h-3.5" />
-                </div>
-                <span>Guided walkthrough with community manager</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#00B87C]/20 flex items-center justify-center text-[#00B87C]">
-                  <Check className="w-3.5 h-3.5" />
-                </div>
-                <span>Complimentary coffee & high-speed Wi-Fi test</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#00B87C]/20 flex items-center justify-center text-[#00B87C]">
-                  <Check className="w-3.5 h-3.5" />
-                </div>
-                <span>Immediate WhatsApp confirmation</span>
-              </div>
+            <h2 className="mb-5 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              A workspace worth seeing in person.
+            </h2>
+            <p className="max-w-md text-sm leading-7 text-gray-500 sm:text-base">
+              Tell us a little about what you need. We’ll arrange a personal tour of our Blue Area workspace.
+            </p>
+            <div className="mt-8 space-y-4 border-t border-gray-100 pt-6 text-sm text-gray-600">
+              <p className="flex items-center gap-3">
+                <MapPin className="h-4 w-4 text-[#008b60]" />
+                Blue Area, Islamabad
+              </p>
+              <p className="flex items-center gap-3">
+                <Clock3 className="h-4 w-4 text-[#008b60]" />
+                Tours available 9:00 AM – 7:00 PM
+              </p>
             </div>
           </div>
 
-          {/* Right Side: Floating Form Card */}
-          <div className="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl p-8 border border-gray-200 shadow-2xl">
-            <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
-              Book a Tour
-            </h3>
+          <div className="w-full rounded-2xl border border-gray-200 bg-white p-5 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.3)] sm:p-8 lg:p-9">
+            <div className="mb-7 border-b border-gray-100 pb-5">
+              <h3 className="text-xl font-semibold tracking-tight text-gray-950 sm:text-2xl">
+                Book a workspace tour
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-gray-500">
+                Complete the form and our team will confirm your visit.
+              </p>
+            </div>
 
             {whatsappLink ? (
-              <div className="text-center py-6 space-y-4">
-                <div className="w-16 h-16 rounded-full bg-[#00B87C]/20 text-[#00B87C] mx-auto flex items-center justify-center">
+              <div className="space-y-4 py-6 text-center">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#e9f8f2] text-[#00A875]">
                   <Check className="w-8 h-8" />
                 </div>
-                <h4 className="text-xl font-bold text-gray-900">Booking Received!</h4>
-                <p className="text-xs text-gray-600">
+                <h4 className="text-xl font-bold text-gray-900">Your visit request is in!</h4>
+                <p className="text-sm leading-6 text-gray-600">
                   Our community team has been notified. Click below to connect with us immediately on WhatsApp.
                 </p>
                 <a
                   href={whatsappLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3.5 bg-[#00B87C] hover:bg-[#009F6B] text-white font-bold text-sm rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#00A875] py-3.5 text-sm font-bold text-white shadow-lg shadow-[#00B87C]/20 transition-colors hover:bg-[#008b60]"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>Chat with Us on WhatsApp</span>
@@ -127,144 +122,171 @@ export const TourBookingWidget: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setWhatsappLink(null)}
-                  className="text-xs text-gray-500 hover:text-gray-900 underline mt-2"
+                  className="mt-2 text-sm text-gray-500 underline underline-offset-4 hover:text-gray-900"
                 >
                   Book another visit
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email input */}
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="tour-name" className="mb-2 block text-sm font-medium text-gray-700">
+                      Full name <span className="text-[#00A875]">*</span>
+                    </label>
+                    <input
+                      id="tour-name"
+                      type="text"
+                      autoComplete="name"
+                      required
+                      placeholder="e.g. Ayesha Khan"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="tour-phone" className="mb-2 block text-sm font-medium text-gray-700">
+                      WhatsApp number
+                    </label>
+                    <input
+                      id="tour-phone"
+                      type="tel"
+                      autoComplete="tel"
+                      placeholder="+92 300 1234567"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                    Email :
+                  <label htmlFor="tour-email" className="mb-2 block text-sm font-medium text-gray-700">
+                    Work email <span className="text-[#00A875]">*</span>
                   </label>
                   <input
+                    id="tour-email"
                     type="email"
+                    autoComplete="email"
                     required
-                    placeholder="johndoe@gmail.com"
+                    placeholder="you@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B87C]"
+                    className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
                   />
                 </div>
 
-                {/* Full name & Phone */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                      Full Name :
+                    <label htmlFor="tour-type" className="mb-2 block text-sm font-medium text-gray-700">
+                      Visiting as
                     </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="John Doe"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-lg bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B87C]"
-                    />
+                    <select
+                      id="tour-type"
+                      value={bookingType}
+                      onChange={(e) => setBookingType(e.target.value)}
+                      className="h-11 w-full appearance-none rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                    >
+                      <option value="Personal">An individual</option>
+                      <option value="Team">A team (2–10 people)</option>
+                      <option value="Enterprise">A larger team (10+ people)</option>
+                      <option value="Podcast">A podcast recording</option>
+                    </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                      WhatsApp / Phone :
+                    <label htmlFor="tour-interest" className="mb-2 block text-sm font-medium text-gray-700">
+                      Interested in
                     </label>
-                    <input
-                      type="tel"
-                      placeholder="+92 333 ..."
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-lg bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B87C]"
-                    />
-                  </div>
-                </div>
-
-                {/* Type dropdown */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                    Type :
-                  </label>
-                  <select
-                    value={bookingType}
-                    onChange={(e) => setBookingType(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B87C]"
-                  >
-                    <option value="Personal">Personal</option>
-                    <option value="Team">Team (2 - 10 people)</option>
-                    <option value="Enterprise">Enterprise (10+ people)</option>
-                    <option value="Podcast">Podcast Studio Recording</option>
-                  </select>
-                </div>
-
-                {/* Plan interest */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                    Plan Interest :
-                  </label>
-                  <select
-                    value={planInterest}
-                    onChange={(e) => setPlanInterest(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B87C]"
-                  >
-                    <option value="Hot Desk">Hot Desk (PKR 18,000/mo)</option>
-                    <option value="Dedicated Desk">Dedicated Desk (PKR 28,000/mo)</option>
-                    <option value="Private Office">Private Office (From PKR 75,000/mo)</option>
-                    <option value="Podcast Studio">Podcast Studio (PKR 4,000/hr)</option>
-                    <option value="Meeting Room">Meeting Boardroom (PKR 2,500/hr)</option>
-                    <option value="Night Shift">Night Shift Pass (PKR 22,000/mo)</option>
-                  </select>
-                </div>
-
-                {/* Date Start & Date End matching Design.png */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                      Date Start :
-                    </label>
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-lg bg-white text-gray-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#00B87C]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                      Date End :
-                    </label>
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-lg bg-white text-gray-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#00B87C]"
-                    />
+                    <select
+                      id="tour-interest"
+                      value={planInterest}
+                      onChange={(e) => setPlanInterest(e.target.value)}
+                      className="h-11 w-full appearance-none rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                    >
+                      <option value="Hot Desk">Hot Desk</option>
+                      <option value="Dedicated Desk">Dedicated Desk</option>
+                      <option value="Private Office">Private Office</option>
+                      <option value="Podcast Studio">Podcast Studio</option>
+                      <option value="Meeting Room">Meeting Room</option>
+                      <option value="Night Shift">Night Shift Pass</option>
+                    </select>
                   </div>
                 </div>
 
-                {/* Terms agreement checkbox matching Design.png */}
-                <div className="flex items-start gap-2 pt-2">
+                <div className="border-t border-gray-100 pt-5">
+                  <div className="mb-4">
+                    <p className="text-sm font-semibold text-gray-800">When would you like to visit?</p>
+                    <p className="mt-1 text-xs leading-5 text-gray-500">Choose your preferred dates and time (9:00 AM–7:00 PM).</p>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <label htmlFor="tour-start-date" className="mb-2 block text-xs font-semibold text-gray-600">
+                        From
+                      </label>
+                      <input
+                        id="tour-start-date"
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="h-11 w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="tour-end-date" className="mb-2 block text-xs font-semibold text-gray-600">
+                        To
+                      </label>
+                      <input
+                        id="tour-end-date"
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="h-11 w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="tour-time" className="mb-2 block text-xs font-semibold text-gray-600">
+                        Preferred time
+                      </label>
+                      <input
+                        id="tour-time"
+                        type="time"
+                        min="09:00"
+                        max="19:00"
+                        required
+                        value={preferredTime}
+                        onChange={(e) => setPreferredTime(e.target.value)}
+                        className="h-11 w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none focus:border-[#00A875] focus:ring-2 focus:ring-[#00A875]/10"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 pt-1">
                   <input
                     type="checkbox"
                     id="terms"
                     checked={agreed}
                     onChange={(e) => setAgreed(e.target.checked)}
-                    className="mt-1 w-4 h-4 rounded text-[#00B87C] focus:ring-[#00B87C] border-gray-300 cursor-pointer"
+                    className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-gray-300 text-[#00A875] focus:ring-[#00B87C]"
                   />
-                  <label htmlFor="terms" className="text-[11px] text-gray-600 leading-snug cursor-pointer">
-                    I agree to the{' '}
-                    <span className="text-[#00B87C] underline">Terms of service</span> and{' '}
-                    <span className="text-[#00B87C] underline">Privacy policy</span> of{' '}
-                    <span className="text-gray-900 font-semibold">The Roarworks</span> company
+                  <label htmlFor="terms" className="cursor-pointer text-xs leading-5 text-gray-500">
+                    I agree to The Roarworks' terms of service and privacy policy.
                   </label>
                 </div>
 
-                {/* SUBMIT button matching Design.png */}
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full mt-4 py-3.5 bg-[#00B87C] hover:bg-[#009F6B] disabled:bg-gray-600 text-white font-bold text-sm tracking-wider uppercase rounded-lg shadow-lg shadow-[#00B87C]/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                  className="group flex w-full items-center justify-center gap-2 rounded-lg bg-[#00A875] py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[#008b60] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {submitting ? 'SUBMITTING...' : 'SUBMIT'}
+                  {submitting ? 'Sending your request...' : 'Request my tour'}
+                  {!submitting && <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />}
                 </button>
+                <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-gray-400">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Your details are only used to arrange your visit.
+                </p>
               </form>
             )}
           </div>
