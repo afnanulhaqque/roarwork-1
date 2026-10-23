@@ -198,12 +198,16 @@ export const Dashboard: React.FC = () => {
       <header className="bg-[#0B0F19] border-b border-white/10 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#00B87C] flex items-center justify-center font-extrabold text-white text-base">
-                R
-              </div>
-              <span className="text-white font-bold text-lg hidden sm:inline">
-                The Roarworks <span className="text-xs px-2 py-0.5 rounded bg-white/10 text-gray-300 font-normal">Operations Console</span>
+            <Link to="/" aria-label="Home" className="flex items-center gap-3">
+              <img
+                src="/images-removebg-preview.png"
+                alt="The Roarworks"
+                width="738"
+                height="270"
+                className="w-32 sm:w-36 h-auto max-h-12 object-contain"
+              />
+              <span className="text-xs px-2 py-0.5 rounded bg-white/10 text-gray-300 font-normal">
+                Operations Console
               </span>
             </Link>
           </div>

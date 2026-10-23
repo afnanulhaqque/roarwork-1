@@ -171,7 +171,7 @@ export const Footer: React.FC = () => {
             <ul className="space-y-3">
               <li>
                 <Link to="/#our-story" className="hover:text-white transition-colors">
-                  About The Roarworks
+                  About Us
                 </Link>
               </li>
               <li>
@@ -204,11 +204,17 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Bar matching Design.png footer */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <span className="text-white font-bold text-lg tracking-tight">
-              The <span className="text-[#00B87C]">Roarworks</span>
-            </span>
+        <div className="pt-8 flex flex-col lg:flex-row items-center justify-between gap-6 text-xs text-gray-500">
+          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-x-4 gap-y-3">
+            <Link to="/" aria-label="Home" className="shrink-0">
+              <img
+                src="/images-removebg-preview.png"
+                alt="The Roarworks"
+                width="738"
+                height="270"
+                className="w-32 sm:w-36 h-auto max-h-12 object-contain"
+              />
+            </Link>
             <span className="text-gray-600 hidden sm:block">|</span>
             <span className="flex items-center gap-1 text-gray-400">
               <MapPin className="w-3.5 h-3.5 text-[#00B87C]" />
@@ -225,14 +231,14 @@ export const Footer: React.FC = () => {
               info@theroarworks.com
             </a>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <a href="https://www.instagram.com/theroarworks/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-500 hover:text-[#00B87C] transition-colors">
               <InstagramIcon className="w-4 h-4" />
             </a>
             <a href="https://www.linkedin.com/company/theroarworks/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-gray-500 hover:text-[#00B87C] transition-colors">
               <LinkedinIcon className="w-4 h-4" />
             </a>
-            <span>© 2026 The Roarworks. All rights reserved.</span>
+            <span>© 2026 All rights reserved.</span>
           </div>
         </div>
       </div>

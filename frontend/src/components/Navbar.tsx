@@ -27,20 +27,14 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-40 w-full glass-nav backdrop-blur-md bg-[#0B0F19]/90 border-b border-white/10 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Brand Logo */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00E59B] to-[#00B87C] p-0.5 shadow-lg shadow-[#00B87C]/20 group-hover:scale-105 transition-transform">
-            <div className="w-full h-full bg-[#0B0F19] rounded-[10px] flex items-center justify-center">
-              <span className="text-white font-extrabold text-xl tracking-tighter">R</span>
-            </div>
-          </div>
-          <div>
-            <span className="text-white font-bold text-xl tracking-tight block">
-              The <span className="text-[#00B87C]">Roarworks</span>
-            </span>
-            <span className="text-xs text-gray-400 font-medium block -mt-1 tracking-wider uppercase">
-              Blue Area · Islamabad
-            </span>
-          </div>
+        <Link to="/" aria-label="Home" className="flex items-center group">
+          <img
+            src="/images-removebg-preview.png"
+            alt="The Roarworks"
+            width="738"
+            height="270"
+            className="w-32 sm:w-40 lg:w-44 h-auto max-h-14 object-contain group-hover:scale-[1.02] transition-transform"
+          />
         </Link>
 
         {/* Desktop Navigation */}

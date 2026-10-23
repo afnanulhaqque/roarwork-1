@@ -35,13 +35,14 @@ export const Login: React.FC = () => {
         
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-4 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00E59B] to-[#00B87C] flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-[#00B87C]/25 group-hover:scale-105 transition-transform">
-              R
-            </div>
-            <span className="text-white font-bold text-xl tracking-tight">
-              The <span className="text-[#00B87C]">Roarworks</span>
-            </span>
+          <Link to="/" aria-label="Home" className="inline-flex mb-4 group">
+            <img
+              src="/images-removebg-preview.png"
+              alt="The Roarworks"
+              width="738"
+              height="270"
+              className="w-44 h-auto max-h-16 object-contain group-hover:scale-[1.02] transition-transform"
+            />
           </Link>
           <h2 className="text-2xl font-extrabold text-white">Staff & Admin Portal</h2>
           <p className="text-xs text-gray-400 mt-1">
