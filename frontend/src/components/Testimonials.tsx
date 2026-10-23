@@ -27,13 +27,13 @@ export const Testimonials: React.FC = () => {
   ];
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-[#0B0F19]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header matching Design.png */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-4">
           <div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
               They Satisfied With <br />
               Our Coworking Space
             </h2>
@@ -42,7 +42,7 @@ export const Testimonials: React.FC = () => {
             <span className="text-[#00B87C] font-bold text-sm tracking-wider uppercase block mb-1">
               Testimonials
             </span>
-            <p className="text-gray-500 text-xs sm:text-sm">
+            <p className="text-gray-400 text-xs sm:text-sm">
               Discover how freelancers, agencies, and international remote teams thrive at The Roarworks.
             </p>
           </div>
@@ -53,7 +53,7 @@ export const Testimonials: React.FC = () => {
           {reviews.map((rev) => (
             <div
               key={rev.name}
-              className="bg-[#F0FAF5] hover:bg-[#E6F7EF] rounded-2xl p-8 transition-all duration-300 border border-[#00B87C]/15 shadow-sm hover:shadow-md flex flex-col justify-between"
+              className="bg-[#121826] hover:bg-[#172033] rounded-2xl p-8 transition-all duration-300 border border-white/10 shadow-sm hover:shadow-md flex flex-col justify-between"
             >
               <div>
                 {/* Author Info with Circular Avatar */}
@@ -64,10 +64,10 @@ export const Testimonials: React.FC = () => {
                     className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
                   />
                   <div>
-                    <h3 className="font-bold text-gray-900 text-base">
+                    <h3 className="font-bold text-white text-base">
                       {rev.name}
                     </h3>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-400">
                       {rev.role}
                     </p>
                   </div>
@@ -81,7 +81,7 @@ export const Testimonials: React.FC = () => {
                 </div>
 
                 {/* Review Text */}
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed italic">
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed italic">
                   "{rev.content}"
                 </p>
               </div>

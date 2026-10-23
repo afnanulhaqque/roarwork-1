@@ -75,7 +75,7 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="hover:text-white transition-colors">
+                <Link to="/#our-story" className="hover:text-white transition-colors">
                   Space Tour Guide
                 </Link>
               </li>
@@ -170,7 +170,7 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/about" className="hover:text-white transition-colors">
+                <Link to="/#our-story" className="hover:text-white transition-colors">
                   About The Roarworks
                 </Link>
               </li>

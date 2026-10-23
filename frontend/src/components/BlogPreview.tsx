@@ -60,12 +60,12 @@ export const BlogPreview: React.FC = () => {
   }, []);
 
   return (
-    <section className="py-24 bg-[#EAF7F2]">
+    <section className="py-24 bg-[#0B0F19]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Heading matching Design.png */}
         <div className="mb-12">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Our Latest Blog
           </h2>
         </div>
@@ -76,7 +76,7 @@ export const BlogPreview: React.FC = () => {
             <Link
               key={post.id}
               to={`/blog/${post.slug}`}
-              className="group block bg-transparent transition-transform transform hover:-translate-y-1"
+              className="group block bg-[#121826] rounded-xl p-4 border border-white/10 transition-transform transform hover:-translate-y-1"
             >
               <div className="w-full h-56 rounded-xl overflow-hidden mb-4 shadow-sm group-hover:shadow-md transition-shadow">
                 <img
@@ -87,19 +87,19 @@ export const BlogPreview: React.FC = () => {
               </div>
 
               {/* Tag and read time line matching Design.png */}
-              <div className="flex items-center gap-3 text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">
+              <div className="flex items-center gap-3 text-xs text-gray-400 uppercase tracking-wider mb-2 font-semibold">
                 <span className="text-[#00B87C] font-bold">
                   {post.category}
                 </span>
-                <span className="text-gray-400">—</span>
+                <span className="text-gray-500">—</span>
                 <span className="flex items-center gap-1 font-normal lowercase">
-                  <Clock className="w-3 h-3 text-gray-400" />
+                  <Clock className="w-3 h-3 text-gray-500" />
                   {post.read_time}
                 </span>
               </div>
 
               {/* Title matching Design.png */}
-              <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#00B87C] transition-colors leading-snug">
+              <h3 className="text-lg font-bold text-white group-hover:text-[#00B87C] transition-colors leading-snug">
                 {post.title}
               </h3>
             </Link>

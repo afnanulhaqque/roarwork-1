@@ -53,31 +53,31 @@ export const TourBookingWidget: React.FC = () => {
   };
 
   return (
-    <section id="book-tour" className="relative py-24 bg-[#0A0E17] overflow-hidden">
+    <section id="book-tour" className="relative py-24 bg-[#F3F8F6] overflow-hidden">
       {/* Background Image of Coworkers at Desks matching Design.png */}
       <div 
-        className="absolute inset-0 bg-cover bg-center opacity-45"
+        className="absolute inset-0 bg-cover bg-center opacity-10"
         style={{
           backgroundImage: `url('/booking_tour.jpeg')`,
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F19]/90 via-[#0B0F19]/70 to-[#0B0F19]/90" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#F3F8F6]/95 via-[#F3F8F6]/90 to-[#F3F8F6]/95" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
           
           {/* Left Side: Teaser Text */}
-          <div className="max-w-xl text-white">
+          <div className="max-w-xl text-gray-900">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00B87C]/20 text-[#00B87C] text-xs font-semibold uppercase tracking-wider mb-4 border border-[#00B87C]/30">
               Personalized Workspace Tour
             </div>
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-6">
               Experience The Roarworks in Person.
             </h2>
-            <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-8">
+            <p className="text-gray-600 text-sm sm:text-base leading-relaxed mb-8">
               Tour our flexible hot desks, executive conference rooms, soundproof podcast studio, and member lounge in Blue Area, Islamabad. Free day pass provided with every guided tour.
             </p>
-            <div className="space-y-3 text-sm text-gray-300">
+            <div className="space-y-3 text-sm text-gray-700">
               <div className="flex items-center gap-3">
                 <div className="w-5 h-5 rounded-full bg-[#00B87C]/20 flex items-center justify-center text-[#00B87C]">
                   <Check className="w-3.5 h-3.5" />
@@ -99,9 +99,9 @@ export const TourBookingWidget: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Side: Floating Dark Form Card matching Design.png */}
-          <div className="w-full max-w-md bg-[#121826]/95 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl">
-            <h3 className="text-2xl font-bold text-white text-center mb-6">
+          {/* Right Side: Floating Form Card */}
+          <div className="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl p-8 border border-gray-200 shadow-2xl">
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
               Book a Tour
             </h3>
 
@@ -110,8 +110,8 @@ export const TourBookingWidget: React.FC = () => {
                 <div className="w-16 h-16 rounded-full bg-[#00B87C]/20 text-[#00B87C] mx-auto flex items-center justify-center">
                   <Check className="w-8 h-8" />
                 </div>
-                <h4 className="text-xl font-bold text-white">Booking Received!</h4>
-                <p className="text-xs text-gray-300">
+                <h4 className="text-xl font-bold text-gray-900">Booking Received!</h4>
+                <p className="text-xs text-gray-600">
                   Our community team has been notified. Click below to connect with us immediately on WhatsApp.
                 </p>
                 <a
@@ -127,7 +127,7 @@ export const TourBookingWidget: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setWhatsappLink(null)}
-                  className="text-xs text-gray-400 hover:text-white underline mt-2"
+                  className="text-xs text-gray-500 hover:text-gray-900 underline mt-2"
                 >
                   Book another visit
                 </button>
@@ -136,7 +136,7 @@ export const TourBookingWidget: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Email input */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
                     Email :
                   </label>
                   <input
@@ -152,7 +152,7 @@ export const TourBookingWidget: React.FC = () => {
                 {/* Full name & Phone */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
                       Full Name :
                     </label>
                     <input
@@ -165,7 +165,7 @@ export const TourBookingWidget: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
                       WhatsApp / Phone :
                     </label>
                     <input
@@ -180,7 +180,7 @@ export const TourBookingWidget: React.FC = () => {
 
                 {/* Type dropdown */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
                     Type :
                   </label>
                   <select
@@ -197,7 +197,7 @@ export const TourBookingWidget: React.FC = () => {
 
                 {/* Plan interest */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
                     Plan Interest :
                   </label>
                   <select
@@ -217,7 +217,7 @@ export const TourBookingWidget: React.FC = () => {
                 {/* Date Start & Date End matching Design.png */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
                       Date Start :
                     </label>
                     <input
@@ -228,7 +228,7 @@ export const TourBookingWidget: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
                       Date End :
                     </label>
                     <input
@@ -249,11 +249,11 @@ export const TourBookingWidget: React.FC = () => {
                     onChange={(e) => setAgreed(e.target.checked)}
                     className="mt-1 w-4 h-4 rounded text-[#00B87C] focus:ring-[#00B87C] border-gray-300 cursor-pointer"
                   />
-                  <label htmlFor="terms" className="text-[11px] text-gray-300 leading-snug cursor-pointer">
+                  <label htmlFor="terms" className="text-[11px] text-gray-600 leading-snug cursor-pointer">
                     I agree to the{' '}
                     <span className="text-[#00B87C] underline">Terms of service</span> and{' '}
                     <span className="text-[#00B87C] underline">Privacy policy</span> of{' '}
-                    <span className="text-white font-semibold">The Roarworks</span> company
+                    <span className="text-gray-900 font-semibold">The Roarworks</span> company
                   </label>
                 </div>
 

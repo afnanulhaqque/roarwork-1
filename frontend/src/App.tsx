@@ -8,7 +8,6 @@ import { Footer } from './components/Footer';
 // Pages
 import { Home } from './pages/Home';
 import { Offerings } from './pages/Offerings';
-import { About } from './pages/About';
 import { Partnerships } from './pages/Partnerships';
 import { Team } from './pages/Team';
 import { BlogList } from './pages/BlogList';
@@ -50,7 +49,6 @@ const AppLayout: React.FC = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/offerings" element={<Offerings />} />
-          <Route path="/about" element={<About />} />
           <Route path="/partnerships" element={<Partnerships />} />
           <Route path="/team" element={<Team />} />
           <Route path="/blog" element={<BlogList />} />
