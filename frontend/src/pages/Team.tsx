@@ -15,43 +15,51 @@ export const Team: React.FC = () => {
         setMembers([
           {
             id: '1',
-            name: 'Afnan Ul Haq',
-            role: 'Managing Director & Founder',
-            bio: "Serial entrepreneur passionate about building Islamabad's most vibrant creator and tech ecosystem in Blue Area.",
-            photo_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
-            email: 'afnan@roarworks.com',
-            linkedin_url: 'https://linkedin.com',
+            name: 'Tatheer Fatemah',
+            role: 'CEO',
+            bio: 'Leading the vision and growth of The Roarworks.',
+            photo_url: '/team-member-female.png',
             display_order: 1,
           },
           {
             id: '2',
-            name: 'Sarah Khan',
-            role: 'Community & Operations Lead',
-            bio: 'Ensuring seamless day and night operations, female-friendly security, and welcoming community vibes for all members.',
-            photo_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80',
-            email: 'sarah@roarworks.com',
-            linkedin_url: 'https://linkedin.com',
+            name: 'Tayyiba Mustafa',
+            role: 'General Manager',
+            bio: 'Overseeing daily operations and delivering a seamless member experience.',
+            photo_url: '/team-member-female.png',
             display_order: 2,
           },
           {
             id: '3',
-            name: 'Hamza Ali',
-            role: 'Studio & Media Producer',
-            bio: 'Audiophile and media engineer managing The Roarworks Podcast Studio, multi-cam switching, and audio mastering.',
-            photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
-            email: 'hamza@roarworks.com',
-            linkedin_url: 'https://linkedin.com',
+            name: 'Nabeel Sadique',
+            role: 'Office Administrator',
+            bio: 'Supporting the team and keeping office operations organized.',
+            photo_url: '/team-member-male.png',
             display_order: 3,
           },
           {
             id: '4',
-            name: 'Zoya Malik',
-            role: 'Member Experience Coordinator',
-            bio: 'Dedicated to tour bookings, shift scheduling, and ensuring rapid one-hour follow-ups on all visitor inquiries.',
-            photo_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80',
-            email: 'zoya@roarworks.com',
-            linkedin_url: 'https://linkedin.com',
+            name: 'Abdul Basit',
+            role: 'IT Executive',
+            bio: 'Supporting reliable technology and IT services across the workspace.',
             display_order: 4,
+            photo_url: '/team-member-male.png',
+          },
+          {
+            id: '5',
+            name: 'Rijah Nisar',
+            role: 'Sales Executive',
+            bio: 'Helping prospective members find the right workspace solution.',
+            display_order: 5,
+            photo_url: '/team-member-female.png',
+          },
+          {
+            id: '6',
+            name: 'Fatima Iftikhar',
+            role: 'Social Media Manager',
+            bio: 'Sharing The Roarworks community and updates across social platforms.',
+            display_order: 6,
+            photo_url: '/team-member-female.png',
           },
         ]);
       }
@@ -71,7 +79,7 @@ export const Team: React.FC = () => {
             The Faces Behind The Roarworks
           </h1>
           <p className="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Our passionate hospitality, operations, and audio engineering team dedicated to making your workday seamless.
+            Meet the people leading our team, supporting daily operations, and building The Roarworks community.
           </p>
         </div>
       </section>

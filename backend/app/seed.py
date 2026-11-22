@@ -184,48 +184,38 @@ At The Roarworks, many of our resident agency teams host monthly client reviews 
             await db.commit()
 
         # 5. Team Members
-        team_count = (await db.execute(select(TeamMember))).scalars().all()
-        if not team_count:
-            members = [
-                TeamMember(
-                    name="Afnan Ul Haq",
-                    role="Managing Director & Founder",
-                    bio="Serial entrepreneur passionate about building Islamabad's most vibrant creator and tech ecosystem in Blue Area.",
-                    photo_url="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
-                    email="afnan@roarworks.com",
-                    linkedin_url="https://linkedin.com",
-                    display_order=1
-                ),
-                TeamMember(
-                    name="Sarah Khan",
-                    role="Community & Operations Lead",
-                    bio="Ensuring seamless day and night operations, female-friendly security, and welcoming community vibes for all members.",
-                    photo_url="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
-                    email="sarah@roarworks.com",
-                    linkedin_url="https://linkedin.com",
-                    display_order=2
-                ),
-                TeamMember(
-                    name="Hamza Ali",
-                    role="Studio & Media Producer",
-                    bio="Audiophile and media engineer managing The Roarworks Podcast Studio, multi-cam switching, and audio mastering.",
-                    photo_url="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
-                    email="hamza@roarworks.com",
-                    linkedin_url="https://linkedin.com",
-                    display_order=3
-                ),
-                TeamMember(
-                    name="Zoya Malik",
-                    role="Member Experience Coordinator",
-                    bio="Dedicated to tour bookings, shift scheduling, and ensuring rapid one-hour follow-ups on all visitor inquiries.",
-                    photo_url="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80",
-                    email="zoya@roarworks.com",
-                    linkedin_url="https://linkedin.com",
-                    display_order=4
-                )
-            ]
-            db.add_all(members)
-            await db.commit()
+        team_specs = [
+            ("Tatheer Fatemah", "CEO", "Leading the vision and growth of The Roarworks.", "/team-member-female.png", 1),
+            ("Tayyiba Mustafa", "General Manager", "Overseeing daily operations and delivering a seamless member experience.", "/team-member-female.png", 2),
+            ("Nabeel Sadique", "Office Administrator", "Supporting the team and keeping office operations organized.", "/team-member-male.png", 3),
+            ("Abdul Basit", "IT Executive", "Supporting reliable technology and IT services across the workspace.", "/team-member-male.png", 4),
+            ("Rijah Nisar", "Sales Executive", "Helping prospective members find the right workspace solution.", "/team-member-female.png", 5),
+            ("Fatima Iftikhar", "Social Media Manager", "Sharing The Roarworks community and updates across social platforms.", "/team-member-female.png", 6),
+        ]
+        existing_team = (await db.execute(select(TeamMember))).scalars().all()
+        members_by_name = {member.name: member for member in existing_team}
+        legacy_names = ("Afnan Ul Haq", "Sarah Khan", "Hamza Ali", "Zoya Malik")
+        legacy_members = {name: members_by_name.get(name) for name in legacy_names}
+
+        for name, role, bio, photo_url, display_order in team_specs:
+            member = members_by_name.get(name)
+            if member is None and display_order <= len(legacy_names):
+                member = legacy_members.get(legacy_names[display_order - 1])
+            if member is None:
+                member = TeamMember()
+                db.add(member)
+
+            member.name = name
+            member.role = role
+            member.bio = bio
+            member.photo_url = photo_url
+            member.email = None
+            member.linkedin_url = None
+            member.display_order = display_order
+            member.is_active = True
+            members_by_name[name] = member
+
+        await db.commit()
 
         # 6. Partners
         partner_count = (await db.execute(select(Partner))).scalars().all()
