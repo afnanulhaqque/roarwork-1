@@ -157,7 +157,7 @@ export const TourBookingWidget: React.FC<{ embedded?: boolean }> = ({ embedded =
             </div>
           </div>}
 
-          <div className="w-full rounded-2xl border border-gray-200 bg-white p-5 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.3)] sm:p-8 lg:p-9">
+          <div className={`${embedded ? 'tour-glass-card' : 'border border-gray-200 bg-white shadow-[0_12px_40px_-28px_rgba(15,23,42,0.3)]'} w-full rounded-2xl p-5 sm:p-8 lg:p-9`}>
             <div className="mb-7 border-b border-gray-100 pb-5">
               <h3 className="text-xl font-semibold tracking-tight text-gray-950 sm:text-2xl">
                 Book a workspace tour

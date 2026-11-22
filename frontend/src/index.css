@@ -31,17 +31,183 @@
 
 /* Glassmorphism and Card Styling */
 .glass-dark {
-  background: rgba(15, 21, 33, 0.90);
+  background: rgba(15, 21, 33, 0.72);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-nav {
-  background: rgba(11, 15, 25, 0.85);
+  background: rgba(11, 15, 25, 0.78);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.contact-page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 12% 18%, rgba(0, 184, 124, 0.18), transparent 34rem),
+    radial-gradient(ellipse at 88% 55%, rgba(56, 120, 173, 0.16), transparent 38rem),
+    linear-gradient(145deg, #09120f 0%, #0b1118 48%, #0a0e16 100%);
+}
+
+.contact-page::before,
+.contact-page::after {
+  position: absolute;
+  z-index: -1;
+  width: 24rem;
+  height: 24rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
+
+.contact-page::before {
+  top: 17rem;
+  left: -13rem;
+  box-shadow: 0 0 0 3rem rgba(255, 255, 255, 0.012), 0 0 0 6rem rgba(255, 255, 255, 0.01);
+}
+
+.contact-page::after {
+  top: 56rem;
+  right: -15rem;
+  width: 30rem;
+  height: 30rem;
+  box-shadow: 0 0 0 3rem rgba(255, 255, 255, 0.012), 0 0 0 6rem rgba(255, 255, 255, 0.01);
+}
+
+.contact-hero {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(7, 12, 17, 0.28), rgba(7, 12, 17, 0.82)),
+    linear-gradient(90deg, rgba(7, 12, 17, 0.68), rgba(7, 12, 17, 0.24)),
+    url('/booking_tour.jpeg') center 46% / cover;
+}
+
+.contact-glass-card,
+.tour-glass-card {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.045));
+  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.11);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.contact-glass-card {
+  color: #e7f0ec;
+  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.contact-glass-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 184, 124, 0.32);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.055));
+}
+
+.contact-page .text-gray-900,
+.contact-page .text-gray-800,
+.contact-page .text-gray-700 {
+  color: #edf5f1;
+}
+
+.contact-page .text-gray-600,
+.contact-page .text-gray-500 {
+  color: #a6b5b0;
+}
+
+.contact-page .text-gray-400 {
+  color: #8d9d97;
+}
+
+.contact-page .border-gray-100,
+.contact-page .border-gray-200 {
+  border-color: rgba(255, 255, 255, 0.11);
+}
+
+.contact-page .bg-emerald-50 {
+  background: rgba(0, 184, 124, 0.14);
+}
+
+.contact-page .text-gray-900:hover,
+.contact-page a.text-gray-900:hover {
+  color: #00d99a;
+}
+
+.contact-page #book-tour .tour-glass-card {
+  color: #edf5f1;
+}
+
+.contact-page #book-tour .tour-glass-card h3,
+.contact-page #book-tour .tour-glass-card h4,
+.contact-page #book-tour .tour-glass-card .text-gray-950,
+.contact-page #book-tour .tour-glass-card .text-gray-800,
+.contact-page #book-tour .tour-glass-card .text-gray-700 {
+  color: #edf5f1;
+}
+
+.contact-page #book-tour .tour-glass-card .text-gray-600,
+.contact-page #book-tour .tour-glass-card .text-gray-500,
+.contact-page #book-tour .tour-glass-card .text-gray-400 {
+  color: #a6b5b0;
+}
+
+.contact-page #book-tour .tour-glass-card .border-gray-100 {
+  border-color: rgba(255, 255, 255, 0.11);
+}
+
+.contact-page #book-tour .tour-glass-card input:not([type='checkbox']),
+.contact-page #book-tour .tour-glass-card select {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(5, 12, 15, 0.34);
+  color: #f3f8f6;
+  color-scheme: dark;
+}
+
+.contact-page #book-tour .tour-glass-card input::placeholder {
+  color: #81928c;
+}
+
+.contact-page #book-tour .tour-glass-card input:focus,
+.contact-page #book-tour .tour-glass-card select:focus {
+  border-color: #00b87c;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 184, 124, 0.13);
+}
+
+.contact-page #book-tour .tour-glass-card option {
+  background: #101a1c;
+  color: #f3f8f6;
+}
+
+.contact-page #book-tour .tour-glass-card .bg-white {
+  background: rgba(5, 12, 15, 0.34);
+}
+
+.contact-page #book-tour .tour-glass-card .text-red-600 {
+  color: #fca5a5;
+}
+
+.contact-page #book-tour .tour-glass-card .bg-red-500 {
+  background: #ef4444;
+}
+
+.contact-map {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-glass-card {
+    transition: none;
+  }
+
+  .contact-glass-card:hover {
+    transform: none;
+  }
 }
 
 /* Custom scrollbar */

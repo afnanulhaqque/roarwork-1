@@ -21,8 +21,8 @@ const LinkedinIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 export const Contact: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <section className="bg-[#0B0F19] text-white pt-24 pb-20 border-b border-white/10 text-center">
+    <div className="contact-page min-h-screen text-white">
+      <section className="contact-hero relative pt-24 pb-20 text-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#00B87C]/20 border border-[#00B87C]/30 text-xs font-semibold text-[#00B87C] mb-4">
             Connect With Our Team
@@ -39,7 +39,7 @@ export const Contact: React.FC = () => {
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-5">
+            <div className="contact-glass-card rounded-2xl p-6 space-y-5">
               <h2 className="text-lg font-bold text-gray-900 mb-4 border-b pb-3">
                 Direct Contact Lines
               </h2>
@@ -107,7 +107,7 @@ export const Contact: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+            <div className="contact-glass-card rounded-2xl p-6 space-y-4">
               <div className="flex items-center gap-3 text-gray-900 font-bold text-base">
                 <Clock className="w-5 h-5 text-[#00B87C]" />
                 <span>Operating Hours</span>
@@ -128,7 +128,7 @@ export const Contact: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-3">
+            <div className="contact-glass-card rounded-2xl p-6 space-y-3">
               <div className="flex items-center gap-2 text-gray-900 font-bold text-base">
                 <MapPin className="w-5 h-5 text-[#00B87C]" />
                 <span>Location &amp; Transit Guide</span>
@@ -151,7 +151,7 @@ export const Contact: React.FC = () => {
       </section>
 
       <section id="location" className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-200 h-[400px] relative">
+        <div className="contact-map rounded-3xl overflow-hidden h-[400px] relative">
           <iframe
             title="The Roarworks Blue Area Islamabad Map"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13279.799863810148!2d73.0559728!3d33.7088924!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df193631f%3A0xc68297f093a0f781!2sBlue%20Area%2C%20Islamabad!5e0!3m2!1sen!2spk!4v1700000000000!5m2!1sen!2spk"
