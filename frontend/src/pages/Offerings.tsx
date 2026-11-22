@@ -28,7 +28,7 @@ export const Offerings: React.FC = () => {
             slug: 'hot-desk',
             tag: 'Flexible Seating',
             description: 'Drop in and choose any open workspace. Ideal for freelancers, remote techies, and mobile professionals in Blue Area.',
-            price_pkr: 18000,
+            price_pkr: 25000,
             billing_period: '/month',
             capacity: '1 Person',
             shift_type: 'Day or Night',
@@ -50,7 +50,7 @@ export const Offerings: React.FC = () => {
             slug: 'dedicated-desk',
             tag: 'Most Popular',
             description: 'Your own permanent desk reserved 24/7 with ergonomic chair, lockable pedestal, and meeting room credits.',
-            price_pkr: 28000,
+            price_pkr: 38000,
             billing_period: '/month',
             capacity: '1 Person',
             shift_type: '24/7 Access',
@@ -72,7 +72,7 @@ export const Offerings: React.FC = () => {
             slug: 'private-office',
             tag: 'For Growing Teams',
             description: 'Fully serviced, lockable private cabins for 2 to 20 people with custom acoustic glass partitions and executive desks.',
-            price_pkr: 75000,
+            price_pkr: 120000,
             billing_period: '/month',
             capacity: '2 - 20 People',
             shift_type: '24/7 Access',
@@ -90,43 +90,40 @@ export const Offerings: React.FC = () => {
           },
           {
             id: '4',
-            name: 'Podcast Studio',
-            slug: 'podcast-studio',
-            tag: 'Unique Differentiator',
-            description: "Islamabad's premier acoustically treated creator studio equipped with Shure SM7B mics, 4K multi-cam switcher, and broadcast lighting.",
-            price_pkr: 4000,
-            billing_period: '/hour',
-            capacity: 'Up to 4 Hosts',
-            shift_type: 'Flexible Booking',
-            features: [
-              '4x Shure SM7B broadcast microphones',
-              'RODECaster Pro II audio console',
-              '2x Sony 4K mirrorless cinema cameras',
-              'Aputure studio softbox lighting grid',
-              'Soundproof acoustic paneling',
-              'On-site sound technician available'
-            ],
-            is_popular: true,
-            is_active: true,
-            display_order: 4
-          },
-          {
-            id: '5',
-            name: 'Meeting & Boardroom',
+            name: 'Meeting Room Only',
             slug: 'meeting-room',
-            tag: 'Hourly / Daily',
-            description: 'Modern presentation space with 65-inch 4K screen, wireless screen casting, conference soundbar, and whiteboard.',
+            tag: 'Hourly',
+            description: 'Modern presentation space with a 4K display, conference camera, audio, and whiteboard.',
             price_pkr: 2500,
             billing_period: '/hour',
             capacity: 'Up to 12 People',
             shift_type: 'Flexible Booking',
             features: [
-              '65-inch 4K wireless presentation display',
-              'Logitech Rally 4K conference camera',
-              'Ergonomic mesh boardroom chairs',
-              'Magnetic glass whiteboards & markers',
-              'High-speed dedicated meeting WiFi',
-              'Refreshment catering upon request'
+              '4K presentation display',
+              'Wireless screen casting',
+              'Conference camera and audio',
+              'Whiteboard and markers',
+              'High-speed meeting WiFi'
+            ],
+            is_popular: false,
+            is_active: true,
+            display_order: 4
+          },
+          {
+            id: '5',
+            name: 'Shared Hall Day Pass',
+            slug: 'shared-hall-day-pass',
+            tag: 'Day Pass',
+            description: 'A flexible daily workspace in our shared hall.',
+            price_pkr: 2500,
+            billing_period: '/day',
+            capacity: '1 Person',
+            shift_type: 'Day Shift',
+            features: [
+              'Shared coworking seating',
+              'High-speed internet',
+              'Tea and coffee',
+              'Generator backup'
             ],
             is_popular: false,
             is_active: true,
@@ -134,25 +131,83 @@ export const Offerings: React.FC = () => {
           },
           {
             id: '6',
-            name: 'Night Shift Pass',
-            slug: 'night-shift-pass',
-            tag: 'US/UK Shift Workers',
-            description: 'Tailored for remote software engineers and agency teams working international hours from 8:00 PM to 8:00 AM.',
-            price_pkr: 22000,
-            billing_period: '/month',
-            capacity: '1 Person',
-            shift_type: 'Night Shift (8PM - 8AM)',
+            name: 'Private Hall - Hourly',
+            slug: 'private-hall-hourly',
+            tag: 'Hourly',
+            description: 'Private hall access for meetings, workshops, or small events.',
+            price_pkr: 4500,
+            billing_period: '/hour',
+            capacity: 'Flexible Capacity',
+            shift_type: 'Flexible Booking',
             features: [
-              'Silent night work environment',
-              'Dedicated security guard on duty',
-              '24/7 coffee & midnight snacks pantry',
-              '100% power uptime with heavy generators',
-              'Comfortable nap pod and lounge area',
-              'High-speed fiber with zero downtime'
+              'Private hall access',
+              'Presentation setup',
+              'High-speed internet',
+              'Flexible seating arrangement'
             ],
             is_popular: false,
             is_active: true,
             display_order: 6
+          },
+          {
+            id: '7',
+            name: 'Private Hall - Day Pass',
+            slug: 'private-hall-day-pass',
+            tag: 'Day Pass',
+            description: 'Private hall access for a full day.',
+            price_pkr: 10000,
+            billing_period: '/day',
+            capacity: 'Flexible Capacity',
+            shift_type: 'Day Shift',
+            features: ['Private hall access', 'Presentation setup', 'High-speed internet', 'Flexible seating arrangement'],
+            is_popular: false,
+            is_active: true,
+            display_order: 7
+          },
+          {
+            id: '8',
+            name: 'Podcast Studio - No Equipment',
+            slug: 'podcast-studio',
+            tag: 'Studio Rental',
+            description: 'Podcast studio access without equipment.',
+            price_pkr: 9000,
+            billing_period: '/session',
+            capacity: 'Up to 4 Hosts',
+            shift_type: 'Flexible Booking',
+            features: ['Acoustically treated studio', 'Studio space only', 'No recording equipment included'],
+            is_popular: false,
+            is_active: true,
+            display_order: 8
+          },
+          {
+            id: '9',
+            name: 'Podcast Studio - Equipment',
+            slug: 'podcast-studio-equipment',
+            tag: 'Audio + Video',
+            description: 'Studio rental with equipment and audio/video recording.',
+            price_pkr: 16000,
+            billing_period: '/session',
+            capacity: 'Up to 4 Hosts',
+            shift_type: 'Flexible Booking',
+            features: ['Recording equipment', 'Audio recording', 'Video recording', 'Acoustically treated studio'],
+            is_popular: true,
+            is_active: true,
+            display_order: 9
+          },
+          {
+            id: '10',
+            name: 'Podcast Studio - Full Package',
+            slug: 'podcast-studio-full-package',
+            tag: 'Best Package',
+            description: 'Full podcast production package with basic editing.',
+            price_pkr: 21000,
+            billing_period: '/session',
+            capacity: 'Up to 4 Hosts',
+            shift_type: 'Flexible Booking',
+            features: ['Recording equipment', 'Audio/video recording', 'Basic editing', 'Acoustically treated studio'],
+            is_popular: true,
+            is_active: true,
+            display_order: 10
           }
         ]);
       } finally {
@@ -163,9 +218,9 @@ export const Offerings: React.FC = () => {
   }, [shiftFilter]);
 
   const calculateEstimate = () => {
-    let rate = 28000;
-    if (calcPlan === 'hot') rate = 18000;
-    if (calcPlan === 'private') rate = 35000; // per seat estimate
+    let rate = 38000;
+    if (calcPlan === 'hot') rate = 25000;
+    if (calcPlan === 'private') rate = 120000;
     return (calcSeats * rate).toLocaleString();
   };
 
@@ -240,7 +295,9 @@ export const Offerings: React.FC = () => {
                 <div className="flex items-baseline gap-1 mb-6 pb-6 border-b border-gray-100">
                   <span className="text-xs font-semibold text-gray-500 uppercase">PKR</span>
                   <span className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-                    {plan.price_pkr.toLocaleString()}
+                    {plan.slug === 'private-office'
+                      ? '120,000 - 230,000'
+                      : plan.price_pkr.toLocaleString()}
                   </span>
                   <span className="text-xs text-gray-500 font-medium">
                     {plan.billing_period}

@@ -12,7 +12,7 @@ async def test_list_offerings_public(client: AsyncClient):
     # Verify Hot Desk and Podcast Studio exist
     names = [o["name"] for o in offerings]
     assert "Hot Desk" in names
-    assert "Podcast Studio" in names
+    assert "Podcast Studio - No Equipment" in names
     assert "Dedicated Desk" in names
 
 @pytest.mark.asyncio
@@ -31,5 +31,5 @@ async def test_get_single_offering_by_slug(client: AsyncClient):
     assert response.status_code == 200
     data = response.json()
     assert data["slug"] == "podcast-studio"
-    assert data["price_pkr"] == 4000
+    assert data["price_pkr"] == 9000
     assert len(data["features"]) > 0

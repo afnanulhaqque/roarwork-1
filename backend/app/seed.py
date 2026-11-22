@@ -11,6 +11,7 @@ from app.models.team import TeamMember
 from app.models.partner import Partner
 from app.models.booking import TourBooking
 from app.models.rebac import RebacTuple
+from app.core.redis import delete_cache
 
 async def seed_initial_data():
     async with AsyncSessionLocal() as db:
@@ -74,138 +75,43 @@ async def seed_initial_data():
             await db.commit()
 
         # 3. Offerings
-        off_count = (await db.execute(select(Offering))).scalars().all()
-        if not off_count:
-            offerings = [
-                Offering(
-                    name="Hot Desk",
-                    slug="hot-desk",
-                    tag="Flexible Seating",
-                    description="Drop in and choose any open workspace. Ideal for freelancers, remote techies, and mobile professionals in Blue Area.",
-                    price_pkr=18000,
-                    billing_period="/month",
-                    capacity="1 Person",
-                    shift_type="Day or Night",
-                    features_json=json.dumps([
-                        "High-speed dual fiber internet",
-                        "Unlimited artisan tea & green tea",
-                        "Uninterrupted generator backup",
-                        "Female-friendly secure access",
-                        "Access to community events & lounge",
-                        "No lock-in contract"
-                    ]),
-                    is_popular=False,
-                    is_active=True,
-                    display_order=1
-                ),
-                Offering(
-                    name="Dedicated Desk",
-                    slug="dedicated-desk",
-                    tag="Most Popular",
-                    description="Your own permanent desk reserved 24/7 with ergonomic chair, lockable pedestal, and meeting room credits.",
-                    price_pkr=28000,
-                    billing_period="/month",
-                    capacity="1 Person",
-                    shift_type="24/7 Access",
-                    features_json=json.dumps([
-                        "Permanent reserved desk & locker",
-                        "24/7 access (Day & Night shifts)",
-                        "5 hours free meeting room credits",
-                        "Mailing address & courier handling",
-                        "Dedicated power strip with UPS backup",
-                        "Discounted podcast studio rates"
-                    ]),
-                    is_popular=True,
-                    is_active=True,
-                    display_order=2
-                ),
-                Offering(
-                    name="Private Office",
-                    slug="private-office",
-                    tag="For Growing Teams",
-                    description="Fully serviced, lockable private cabins for 2 to 20 people with custom acoustic glass partitions and executive desks.",
-                    price_pkr=75000,
-                    billing_period="/month",
-                    capacity="2 - 20 People",
-                    shift_type="24/7 Access",
-                    features_json=json.dumps([
-                        "Private sound-insulated office suite",
-                        "Company branding on cabin door",
-                        "15 hours monthly boardroom credits",
-                        "24/7 biometric keyless entry",
-                        "Complimentary executive coffee bar",
-                        "Daily housekeeping and sanitization"
-                    ]),
-                    is_popular=False,
-                    is_active=True,
-                    display_order=3
-                ),
-                Offering(
-                    name="Podcast Studio",
-                    slug="podcast-studio",
-                    tag="Unique Differentiator",
-                    description="Islamabad's premier acoustically treated creator studio equipped with Shure SM7B mics, 4K multi-cam switcher, and broadcast lighting.",
-                    price_pkr=4000,
-                    billing_period="/hour",
-                    capacity="Up to 4 Hosts",
-                    shift_type="Flexible Booking",
-                    features_json=json.dumps([
-                        "4x Shure SM7B broadcast microphones",
-                        "RODECaster Pro II audio console",
-                        "2x Sony 4K mirrorless cinema cameras",
-                        "Aputure studio softbox lighting grid",
-                        "Soundproof acoustic paneling",
-                        "On-site sound technician available"
-                    ]),
-                    is_popular=True,
-                    is_active=True,
-                    display_order=4
-                ),
-                Offering(
-                    name="Meeting & Boardroom",
-                    slug="meeting-room",
-                    tag="Hourly / Daily",
-                    description="Modern presentation space with 65-inch 4K screen, wireless screen casting, conference soundbar, and whiteboard.",
-                    price_pkr=2500,
-                    billing_period="/hour",
-                    capacity="Up to 12 People",
-                    shift_type="Flexible Booking",
-                    features_json=json.dumps([
-                        "65-inch 4K wireless presentation display",
-                        "Logitech Rally 4K conference camera",
-                        "Ergonomic mesh boardroom chairs",
-                        "Magnetic glass whiteboards & markers",
-                        "High-speed dedicated meeting WiFi",
-                        "Refreshment catering upon request"
-                    ]),
-                    is_popular=False,
-                    is_active=True,
-                    display_order=5
-                ),
-                Offering(
-                    name="Night Shift Pass",
-                    slug="night-shift-pass",
-                    tag="US/UK Shift Workers",
-                    description="Tailored for remote software engineers and agency teams working international hours from 8:00 PM to 8:00 AM.",
-                    price_pkr=22000,
-                    billing_period="/month",
-                    capacity="1 Person",
-                    shift_type="Night Shift (8PM - 8AM)",
-                    features_json=json.dumps([
-                        "Silent night work environment",
-                        "Dedicated security guard on duty",
-                        "24/7 coffee & midnight snacks pantry",
-                        "100% power uptime with heavy generators",
-                        "Comfortable nap pod and lounge area",
-                        "High-speed fiber with zero downtime"
-                    ]),
-                    is_popular=False,
-                    is_active=True,
-                    display_order=6
-                )
-            ]
-            db.add_all(offerings)
-            await db.commit()
+        offering_specs = [
+            ("Hot Desk", "hot-desk", "Flexible Seating", "Drop in and choose any open workspace.", 25000, "/month", "1 Person", "Day or Night", ["High-speed dual fiber internet", "Generator backup", "Tea and coffee", "Community lounge"], False, 1),
+            ("Dedicated Desk", "dedicated-desk", "Most Popular", "Your own permanent desk reserved 24/7.", 38000, "/month", "1 Person", "24/7 Access", ["Permanent desk and locker", "24/7 access", "Meeting room credits", "Dedicated power backup"], True, 2),
+            ("Private Office", "private-office", "For Growing Teams", "Private office suites from PKR 120,000 to PKR 230,000 per month.", 120000, "/month", "Flexible Capacity", "24/7 Access", ["Private lockable office", "24/7 access", "Utilities included", "Office size and rate vary from PKR 120,000 to PKR 230,000 per month"], False, 3),
+            ("Meeting Room Only", "meeting-room", "Hourly", "Modern meeting space available by the hour.", 2500, "/hour", "Up to 12 People", "Flexible Booking", ["4K presentation display", "Wireless screen casting", "Conference camera and audio", "Whiteboard"], False, 4),
+            ("Shared Hall Day Pass", "shared-hall-day-pass", "Day Pass", "A flexible day pass in the shared hall.", 2500, "/day", "1 Person", "Day Shift", ["Shared hall seating", "High-speed internet", "Tea and coffee", "Generator backup"], False, 5),
+            ("Private Hall - Hourly", "private-hall-hourly", "Hourly", "Private hall access for meetings or events.", 4500, "/hour", "Flexible Capacity", "Flexible Booking", ["Private hall access", "Presentation setup", "High-speed internet"], False, 6),
+            ("Private Hall - Day Pass", "private-hall-day-pass", "Day Pass", "Private hall access for a full day.", 10000, "/day", "Flexible Capacity", "Day Shift", ["Private hall access", "Presentation setup", "High-speed internet"], False, 7),
+            ("Podcast Studio - No Equipment", "podcast-studio", "Studio Rental", "Podcast studio access without equipment.", 9000, "/session", "Up to 4 Hosts", "Flexible Booking", ["Acoustically treated studio", "Studio space only", "No recording equipment included"], False, 8),
+            ("Podcast Studio - Equipment", "podcast-studio-equipment", "Audio + Video", "Studio with equipment and audio/video recording.", 16000, "/session", "Up to 4 Hosts", "Flexible Booking", ["Recording equipment", "Audio recording", "Video recording", "Acoustically treated studio"], True, 9),
+            ("Podcast Studio - Full Package", "podcast-studio-full-package", "Best Package", "Full package with basic editing.", 21000, "/session", "Up to 4 Hosts", "Flexible Booking", ["Recording equipment", "Audio/video recording", "Basic editing", "Acoustically treated studio"], True, 10),
+        ]
+        existing_offerings = (await db.execute(select(Offering))).scalars().all()
+        by_slug = {offering.slug: offering for offering in existing_offerings}
+        wanted_slugs = set()
+        for name, slug, tag, description, price, period, capacity, shift, features, popular, order in offering_specs:
+            wanted_slugs.add(slug)
+            offering = by_slug.get(slug)
+            if offering is None:
+                offering = Offering(slug=slug)
+                db.add(offering)
+            offering.name = name
+            offering.tag = tag
+            offering.description = description
+            offering.price_pkr = price
+            offering.billing_period = period
+            offering.capacity = capacity
+            offering.shift_type = shift
+            offering.features_json = json.dumps(features)
+            offering.is_popular = popular
+            offering.is_active = True
+            offering.display_order = order
+        for offering in existing_offerings:
+            if offering.slug not in wanted_slugs:
+                offering.is_active = False
+        await db.commit()
+        await delete_cache("offerings:list:None:False")
 
         # 4. Blog Posts
         blog_count = (await db.execute(select(BlogPost))).scalars().all()
