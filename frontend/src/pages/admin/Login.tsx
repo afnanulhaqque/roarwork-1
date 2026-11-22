@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, ArrowRight } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('admin@roarworks.com');
@@ -48,16 +48,6 @@ export const Login: React.FC = () => {
           <p className="text-xs text-gray-400 mt-1">
             Blue Area Islamabad Operations & CRM Management
           </p>
-        </div>
-
-        {/* Demo Credentials Box */}
-        <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-300 space-y-1">
-          <div className="flex items-center gap-1.5 text-[#00B87C] font-bold">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Pre-Seeded Demo Credentials:</span>
-          </div>
-          <div>Admin: <code className="text-white bg-black/40 px-1.5 py-0.5 rounded">admin@roarworks.com</code></div>
-          <div>Password: <code className="text-white bg-black/40 px-1.5 py-0.5 rounded">Admin@Roarworks2026!</code></div>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
