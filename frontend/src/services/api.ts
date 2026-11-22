@@ -98,7 +98,9 @@ export interface TeamMemberRecord {
   photo_url: string;
   email?: string;
   linkedin_url?: string;
+  twitter_url?: string;
   display_order: number;
+  is_active?: boolean;
 }
 
 export interface PartnerRecord {
@@ -108,6 +110,19 @@ export interface PartnerRecord {
   website_url?: string;
   category: string;
   description?: string;
+  is_featured?: boolean;
+  display_order?: number;
+}
+
+export interface TestimonialRecord {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+  stars: number;
+  content: string;
+  display_order: number;
+  is_active: boolean;
 }
 
 export const authApi = {
@@ -120,15 +135,25 @@ export const bookingsApi = {
   create: (data: TourBookingPayload) => api.post('/bookings', data),
   list: (params?: { status?: string; search?: string }) => api.get('/bookings', { params }),
   get: (id: string) => api.get(`/bookings/${id}`),
-  update: (id: string, data: any) => api.patch(`/bookings/${id}`, data),
+  update: (
+    id: string,
+    data: Partial<Omit<TourBookingPayload & BookingRecord, 'phone' | 'start_date' | 'end_date' | 'preferred_time' | 'notes'>> & {
+      phone?: string | null;
+      start_date?: string | null;
+      end_date?: string | null;
+      preferred_time?: string | null;
+      notes?: string | null;
+    }
+  ) => api.patch(`/bookings/${id}`, data),
   delete: (id: string) => api.delete(`/bookings/${id}`),
 };
 
 export const offeringsApi = {
-  list: (params?: { shift?: string }) => api.get('/offerings', { params }),
+  list: (params?: { shift?: string; include_inactive?: boolean }) => api.get('/offerings', { params }),
   get: (slugOrId: string) => api.get(`/offerings/${slugOrId}`),
-  create: (data: any) => api.post('/offerings', data),
-  update: (id: string, data: any) => api.patch(`/offerings/${id}`, data),
+  create: (data: Omit<OfferingRecord, 'id'>) => api.post('/offerings', data),
+  update: (id: string, data: Partial<Omit<OfferingRecord, 'tag'>> & { tag?: string | null }) => api.patch(`/offerings/${id}`, data),
+  delete: (id: string) => api.delete(`/offerings/${id}`),
 };
 
 export const blogApi = {
@@ -140,17 +165,37 @@ export const blogApi = {
 };
 
 export const teamApi = {
-  list: () => api.get('/team'),
-  create: (data: any) => api.post('/team', data),
-  update: (id: string, data: any) => api.patch(`/team/${id}`, data),
+  list: (params?: { include_inactive?: boolean }) => api.get('/team', { params }),
+  create: (data: Omit<TeamMemberRecord, 'id' | 'created_at' | 'updated_at'>) => api.post('/team', data),
+  update: (
+    id: string,
+    data: Partial<Omit<TeamMemberRecord, 'email' | 'linkedin_url' | 'twitter_url'>> & {
+      email?: string | null;
+      linkedin_url?: string | null;
+      twitter_url?: string | null;
+    }
+  ) => api.patch(`/team/${id}`, data),
   delete: (id: string) => api.delete(`/team/${id}`),
 };
 
 export const partnersApi = {
   list: () => api.get('/partners'),
-  create: (data: any) => api.post('/partners', data),
-  update: (id: string, data: any) => api.patch(`/partners/${id}`, data),
+  create: (data: Omit<PartnerRecord, 'id' | 'created_at' | 'updated_at'>) => api.post('/partners', data),
+  update: (
+    id: string,
+    data: Partial<Omit<PartnerRecord, 'website_url' | 'description'>> & {
+      website_url?: string | null;
+      description?: string | null;
+    }
+  ) => api.patch(`/partners/${id}`, data),
   delete: (id: string) => api.delete(`/partners/${id}`),
+};
+
+export const testimonialsApi = {
+  list: (params?: { include_inactive?: boolean }) => api.get('/testimonials', { params }),
+  create: (data: Omit<TestimonialRecord, 'id' | 'created_at' | 'updated_at'>) => api.post('/testimonials', data),
+  update: (id: string, data: Partial<TestimonialRecord>) => api.patch(`/testimonials/${id}`, data),
+  delete: (id: string) => api.delete(`/testimonials/${id}`),
 };
 
 export const statsApi = {

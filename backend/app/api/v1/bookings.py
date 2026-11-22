@@ -7,7 +7,7 @@ from app.core.redis import rate_limit
 from app.models.booking import TourBooking
 from app.models.user import User
 from app.schemas.booking import TourBookingCreate, TourBookingUpdate, TourBookingResponse
-from app.api.deps import get_current_user, require_role
+from app.api.deps import get_current_user, get_optional_current_user, require_role
 from app.services.rebac_service import RebacService
 from app.services.notification_service import NotificationService
 from app.services.audit_service import AuditService
@@ -18,16 +18,18 @@ router = APIRouter(prefix="/bookings", tags=["Tour Bookings & Enquiries"])
 async def create_tour_booking(
     request: Request,
     body: TourBookingCreate,
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    client_ip = request.client.host if request.client else "unknown"
-    # Rate limit public submissions to protect from spam
-    allowed = await rate_limit(f"booking_submit:{client_ip}", max_requests=6, window_seconds=60)
-    if not allowed:
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Too many tour requests sent. Please try again in a few minutes or message us on WhatsApp directly."
-        )
+    if not current_user or current_user.role not in ["super_admin", "workspace_manager", "staff"]:
+        client_ip = request.client.host if request.client else "unknown"
+        # Rate limit public submissions to protect from spam
+        allowed = await rate_limit(f"booking_submit:{client_ip}", max_requests=6, window_seconds=60)
+        if not allowed:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Too many tour requests sent. Please try again in a few minutes or message us on WhatsApp directly."
+            )
 
     booking = TourBooking(
         email=body.email.lower().strip(),
@@ -64,7 +66,7 @@ async def create_tour_booking(
         resource_type="tour_booking",
         resource_id=booking.id,
         details={"plan": booking.plan_interest, "type": booking.booking_type},
-        ip_address=client_ip
+        ip_address=request.client.host if request.client else "unknown"
     )
 
     return {
@@ -160,23 +162,29 @@ async def update_booking(
     if current_user.role == "staff" and booking.assigned_to_user_id and booking.assigned_to_user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Staff members cannot modify bookings assigned to other team members.")
 
-    if body.status:
-        booking.status = body.status.upper()
-    if body.assigned_to_user_id is not None:
-        booking.assigned_to_user_id = body.assigned_to_user_id
+    update_data = body.model_dump(exclude_unset=True)
+    if "email" in update_data and update_data["email"] is not None:
+        update_data["email"] = update_data["email"].lower().strip()
+    if "full_name" in update_data and update_data["full_name"] is not None:
+        update_data["full_name"] = update_data["full_name"].strip()
+    if "status" in update_data and update_data["status"] is not None:
+        update_data["status"] = update_data["status"].upper()
+
+    for field in ("email", "full_name", "phone", "booking_type", "plan_interest", "start_date", "end_date", "status", "notes", "preferred_time"):
+        if field in update_data:
+            setattr(booking, field, update_data[field])
+
+    if "assigned_to_user_id" in update_data:
+        booking.assigned_to_user_id = update_data["assigned_to_user_id"]
         # Grant ReBAC tuple to the assigned user
-        if body.assigned_to_user_id:
+        if update_data["assigned_to_user_id"]:
             await RebacService.grant(
                 db=db,
-                entity_id=body.assigned_to_user_id,
+                entity_id=update_data["assigned_to_user_id"],
                 relation="assignee",
                 object_type="tour_booking",
                 object_id=booking.id
             )
-    if body.notes is not None:
-        booking.notes = body.notes
-    if body.preferred_time is not None:
-        booking.preferred_time = body.preferred_time
 
     await db.commit()
     await db.refresh(booking)

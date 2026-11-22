@@ -4,11 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from app.core.database import get_db
-from app.core.redis import get_cache, set_cache, delete_cache
+from app.core.redis import get_cache, set_cache, delete_cache_prefix
 from app.models.offering import Offering
 from app.models.user import User
 from app.schemas.offering import OfferingCreate, OfferingUpdate, OfferingResponse
-from app.api.deps import require_role
+from app.api.deps import get_optional_current_user, require_role
 
 router = APIRouter(prefix="/offerings", tags=["Offerings & Plans"])
 
@@ -40,10 +40,14 @@ def _to_response(o: Offering) -> OfferingResponse:
 async def list_offerings(
     shift: Optional[str] = Query(None, description="Filter by shift: Day, Night, 24/7, Flexible"),
     include_inactive: bool = Query(False),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    if include_inactive and (not current_user or current_user.role not in ["super_admin", "workspace_manager"]):
+        raise HTTPException(status_code=403, detail="Admin access required to view inactive offerings")
+
     cache_key = f"offerings:list:{shift}:{include_inactive}"
-    cached = await get_cache(cache_key)
+    cached = await get_cache(cache_key) if not include_inactive else None
     if cached:
         try:
             raw_list = json.loads(cached)
@@ -68,6 +72,8 @@ async def list_offerings(
 
     # Cache for 10 minutes
     try:
+        if include_inactive:
+            return responses
         json_data = json.dumps([r.model_dump(mode="json") for r in responses])
         await set_cache(cache_key, json_data, expire_seconds=600)
     except Exception:
@@ -88,6 +94,22 @@ async def get_offering(
     if not offering:
         raise HTTPException(status_code=404, detail="Offering plan not found")
     return _to_response(offering)
+
+@router.delete("/{offering_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_offering(
+    offering_id: str,
+    current_user: User = Depends(require_role(["super_admin", "workspace_manager"])),
+    db: AsyncSession = Depends(get_db)
+):
+    stmt = select(Offering).where(Offering.id == offering_id)
+    res = await db.execute(stmt)
+    offering = res.scalar_one_or_none()
+    if not offering:
+        raise HTTPException(status_code=404, detail="Offering not found")
+
+    await db.delete(offering)
+    await db.commit()
+    await delete_cache_prefix("offerings:list:")
 
 @router.post("", response_model=OfferingResponse, status_code=status.HTTP_201_CREATED)
 async def create_offering(
@@ -112,7 +134,7 @@ async def create_offering(
     db.add(offering)
     await db.commit()
     await db.refresh(offering)
-    await delete_cache("offerings:list:None:False")
+    await delete_cache_prefix("offerings:list:")
     return _to_response(offering)
 
 @router.patch("/{offering_id}", response_model=OfferingResponse)
@@ -128,32 +150,13 @@ async def update_offering(
     if not offering:
         raise HTTPException(status_code=404, detail="Offering not found")
 
-    if body.name is not None:
-        offering.name = body.name
-    if body.slug is not None:
-        offering.slug = body.slug
-    if body.tag is not None:
-        offering.tag = body.tag
-    if body.description is not None:
-        offering.description = body.description
-    if body.price_pkr is not None:
-        offering.price_pkr = body.price_pkr
-    if body.billing_period is not None:
-        offering.billing_period = body.billing_period
-    if body.capacity is not None:
-        offering.capacity = body.capacity
-    if body.shift_type is not None:
-        offering.shift_type = body.shift_type
-    if body.features is not None:
-        offering.features_json = json.dumps(body.features)
-    if body.is_popular is not None:
-        offering.is_popular = body.is_popular
-    if body.is_active is not None:
-        offering.is_active = body.is_active
-    if body.display_order is not None:
-        offering.display_order = body.display_order
+    update_data = body.model_dump(exclude_unset=True)
+    if "features" in update_data:
+        update_data["features_json"] = json.dumps(update_data.pop("features"))
+    for field, value in update_data.items():
+        setattr(offering, field, value)
 
     await db.commit()
     await db.refresh(offering)
-    await delete_cache("offerings:list:None:False")
+    await delete_cache_prefix("offerings:list:")
     return _to_response(offering)

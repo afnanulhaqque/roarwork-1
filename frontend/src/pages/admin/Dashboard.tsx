@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -8,16 +8,19 @@ import {
   offeringsApi,
   teamApi,
   partnersApi,
+  testimonialsApi,
   statsApi,
   rebacApi,
   BookingRecord,
   BlogPostRecord,
   OfferingRecord,
   TeamMemberRecord,
-  PartnerRecord
+  PartnerRecord,
+  TestimonialRecord,
+  TourBookingPayload
 } from '../../services/api';
+import { AdminField, AdminRecordModal } from './AdminRecordModal';
 import {
-  LayoutDashboard,
   Users,
   FileText,
   DollarSign,
@@ -28,12 +31,9 @@ import {
   Plus,
   Trash2,
   Edit,
-  ExternalLink,
   CheckCircle,
-  Clock,
   LogOut,
   RefreshCw,
-  Server
 } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
@@ -42,7 +42,8 @@ export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'offerings' | 'team' | 'rebac'>('bookings');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'blogs' | 'offerings' | 'team' | 'testimonials' | 'rebac'>('bookings');
+  const canManageContent = user?.role === 'super_admin' || user?.role === 'workspace_manager';
 
   // Stats
   const [stats, setStats] = useState<any>(null);
@@ -64,6 +65,9 @@ export const Dashboard: React.FC = () => {
   // Team & Partners state
   const [teamMembers, setTeamMembers] = useState<TeamMemberRecord[]>([]);
   const [partners, setPartners] = useState<PartnerRecord[]>([]);
+  const [testimonials, setTestimonials] = useState<TestimonialRecord[]>([]);
+  const [managedEntity, setManagedEntity] = useState<'booking' | 'offering' | 'team' | 'partner' | 'testimonial' | null>(null);
+  const [managedRecord, setManagedRecord] = useState<Record<string, unknown> | null>(null);
 
   // ReBAC State
   const [rebacTuples, setRebacTuples] = useState<any[]>([]);
@@ -79,19 +83,20 @@ export const Dashboard: React.FC = () => {
   const [grantObjectType, setGrantObjectType] = useState('blog_post');
   const [grantObjectId, setGrantObjectId] = useState('');
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setRefreshing(true);
     try {
-      const [sRes, bRes, blRes, offRes, tmRes, pRes] = await Promise.all([
+      const [sRes, bRes, blRes, offRes, tmRes, pRes, testimonialRes] = await Promise.all([
         statsApi.getDashboard().catch(() => ({ data: null })),
         bookingsApi.list({
           status: bookingStatusFilter === 'ALL' ? undefined : bookingStatusFilter,
           search: bookingSearch || undefined
-        }).catch(() => ({ data: [] })),
-        blogApi.list({ all_posts: true }).catch(() => ({ data: [] })),
-        offeringsApi.list().catch(() => ({ data: [] })),
-        teamApi.list().catch(() => ({ data: [] })),
-        partnersApi.list().catch(() => ({ data: [] })),
+        }),
+        blogApi.list({ all_posts: true }),
+        offeringsApi.list({ include_inactive: canManageContent }),
+        teamApi.list({ include_inactive: canManageContent }),
+        partnersApi.list(),
+        testimonialsApi.list({ include_inactive: canManageContent }),
       ]);
 
       setStats(sRes.data);
@@ -100,23 +105,225 @@ export const Dashboard: React.FC = () => {
       setOfferings(offRes.data);
       setTeamMembers(tmRes.data);
       setPartners(pRes.data);
+      setTestimonials(testimonialRes.data);
 
       if (user?.role === 'super_admin' || user?.role === 'workspace_manager') {
-        const tRes = await rebacApi.listTuples().catch(() => ({ data: [] }));
+        const tRes = await rebacApi.listTuples();
         setRebacTuples(tRes.data);
       }
-    } catch (err) {
+    } catch {
       showToast('Error refreshing dashboard data', 'error');
     } finally {
       setRefreshing(false);
     }
-  };
+  }, [bookingSearch, bookingStatusFilter, canManageContent, showToast, user]);
 
   useEffect(() => {
     loadData();
-  }, [bookingStatusFilter, bookingSearch]);
+  }, [loadData]);
 
-  const handleUpdateBookingStatus = async (id: string, newStatus: string) => {
+  const managedFields: AdminField[] = (() => {
+    if (managedEntity === 'booking') {
+      return [
+        { name: 'full_name', label: 'Full name', required: true },
+        { name: 'email', label: 'Email', type: 'email', required: true },
+        { name: 'phone', label: 'Phone' },
+        { name: 'booking_type', label: 'Booking type', type: 'select', options: ['Personal', 'Team', 'Enterprise', 'Podcast'] },
+        { name: 'plan_interest', label: 'Plan interest', required: true },
+        { name: 'start_date', label: 'Start date' },
+        { name: 'end_date', label: 'End date' },
+        { name: 'preferred_time', label: 'Preferred time' },
+        ...(managedRecord?.id ? [{ name: 'status', label: 'Status', type: 'select' as const, options: ['NEW', 'CONTACTED', 'TOUR_SCHEDULED', 'COMPLETED', 'CANCELLED'] }] : []),
+        { name: 'notes', label: 'Notes', type: 'textarea' },
+        { name: 'terms_agreed', label: 'Terms agreed', type: 'checkbox' },
+      ];
+    }
+    if (managedEntity === 'offering') {
+      return [
+        { name: 'name', label: 'Name', required: true },
+        { name: 'slug', label: 'Slug', required: true },
+        { name: 'tag', label: 'Tag' },
+        { name: 'price_pkr', label: 'Price (PKR)', type: 'number', required: true },
+        { name: 'billing_period', label: 'Billing period', required: true },
+        { name: 'capacity', label: 'Capacity', required: true },
+        { name: 'shift_type', label: 'Shift type', required: true },
+        { name: 'display_order', label: 'Display order', type: 'number' },
+        { name: 'description', label: 'Description', type: 'textarea', required: true },
+        { name: 'features', label: 'Features', type: 'list' },
+        { name: 'is_popular', label: 'Popular offering', type: 'checkbox' },
+        { name: 'is_active', label: 'Active', type: 'checkbox' },
+      ];
+    }
+    if (managedEntity === 'team') {
+      return [
+        { name: 'name', label: 'Name', required: true },
+        { name: 'role', label: 'Role', required: true },
+        { name: 'photo_url', label: 'Photo URL', type: 'url', required: true },
+        { name: 'email', label: 'Email', type: 'email' },
+        { name: 'linkedin_url', label: 'LinkedIn URL', type: 'url' },
+        { name: 'twitter_url', label: 'Twitter URL', type: 'url' },
+        { name: 'display_order', label: 'Display order', type: 'number' },
+        { name: 'bio', label: 'Bio', type: 'textarea', required: true },
+        { name: 'is_active', label: 'Active', type: 'checkbox' },
+      ];
+    }
+    if (managedEntity === 'partner') {
+      return [
+        { name: 'name', label: 'Name', required: true },
+        { name: 'category', label: 'Category', required: true },
+        { name: 'logo_url', label: 'Logo URL', type: 'url', required: true },
+        { name: 'website_url', label: 'Website URL', type: 'url' },
+        { name: 'display_order', label: 'Display order', type: 'number' },
+        { name: 'description', label: 'Description', type: 'textarea' },
+        { name: 'is_featured', label: 'Featured partner', type: 'checkbox' },
+      ];
+    }
+    if (managedEntity === 'testimonial') {
+      return [
+        { name: 'name', label: 'Name', required: true },
+        { name: 'role', label: 'Role', required: true },
+        { name: 'avatar', label: 'Avatar URL', type: 'url', required: true },
+        { name: 'stars', label: 'Star rating (1–5)', type: 'number', required: true },
+        { name: 'display_order', label: 'Display order', type: 'number' },
+        { name: 'content', label: 'Testimonial', type: 'textarea', required: true },
+        { name: 'is_active', label: 'Active', type: 'checkbox' },
+      ];
+    }
+    return [];
+  })();
+
+  const startManaging = (entity: NonNullable<typeof managedEntity>, record?: Record<string, unknown>) => {
+    const defaults: Record<NonNullable<typeof managedEntity>, Record<string, unknown>> = {
+      booking: { full_name: '', email: '', phone: '', booking_type: 'Personal', plan_interest: '', start_date: '', end_date: '', preferred_time: 'Morning Shift', notes: '', terms_agreed: true },
+      offering: { name: '', slug: '', tag: '', description: '', price_pkr: 0, billing_period: '/month', capacity: '1 Person', shift_type: 'Flexible', features: [], is_popular: false, is_active: true, display_order: offerings.length + 1 },
+      team: { name: '', role: '', bio: '', photo_url: '', email: '', linkedin_url: '', twitter_url: '', display_order: teamMembers.length + 1, is_active: true },
+      partner: { name: '', logo_url: '', website_url: '', category: 'Tech Startup', description: '', is_featured: true, display_order: partners.length + 1 },
+      testimonial: { name: '', role: '', avatar: '', stars: 5, content: '', display_order: testimonials.length + 1, is_active: true },
+    };
+    setManagedEntity(entity);
+    setManagedRecord(record ? { ...defaults[entity], ...record } : defaults[entity]);
+  };
+
+  const closeManagedEditor = () => {
+    setManagedEntity(null);
+    setManagedRecord(null);
+  };
+
+  const bookingStatuses: BookingRecord['status'][] = ['NEW', 'CONTACTED', 'TOUR_SCHEDULED', 'COMPLETED', 'CANCELLED'];
+  const getBookingStatus = (value: string): BookingRecord['status'] =>
+    bookingStatuses.find((status) => status === value) ?? 'NEW';
+
+  const handleSaveManagedRecord = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!managedEntity || !managedRecord) return;
+
+    const text = (field: string) => typeof managedRecord[field] === 'string' ? managedRecord[field] as string : '';
+    const number = (field: string) => {
+      const value = Number(managedRecord[field]);
+      return Number.isFinite(value) ? value : 0;
+    };
+    const checked = (field: string) => managedRecord[field] === true;
+    const list = (field: string) => Array.isArray(managedRecord[field]) ? (managedRecord[field] as string[]) : [];
+    const id = typeof managedRecord.id === 'string' ? managedRecord.id : undefined;
+
+    try {
+      if (managedEntity === 'booking') {
+        const payload: TourBookingPayload = {
+          full_name: text('full_name'),
+          email: text('email'),
+          phone: text('phone') || undefined,
+          booking_type: text('booking_type'),
+          plan_interest: text('plan_interest'),
+          start_date: text('start_date') || undefined,
+          end_date: text('end_date') || undefined,
+          preferred_time: text('preferred_time') || undefined,
+          notes: text('notes') || undefined,
+          terms_agreed: checked('terms_agreed'),
+        };
+        if (id) {
+          await bookingsApi.update(id, {
+            ...payload,
+            phone: text('phone') || null,
+            start_date: text('start_date') || null,
+            end_date: text('end_date') || null,
+            preferred_time: text('preferred_time') || null,
+            notes: text('notes') || null,
+            status: getBookingStatus(text('status')),
+          });
+        }
+        else await bookingsApi.create(payload);
+      } else if (managedEntity === 'offering') {
+        const payload = {
+          name: text('name'), slug: text('slug'), tag: text('tag') || undefined, description: text('description'),
+          price_pkr: number('price_pkr'), billing_period: text('billing_period'), capacity: text('capacity'),
+          shift_type: text('shift_type'), features: list('features'), is_popular: checked('is_popular'),
+          is_active: checked('is_active'), display_order: number('display_order'),
+        };
+        if (id) await offeringsApi.update(id, { ...payload, tag: text('tag') || null });
+        else await offeringsApi.create(payload);
+      } else if (managedEntity === 'team') {
+        const payload = {
+          name: text('name'), role: text('role'), bio: text('bio'), photo_url: text('photo_url'),
+          email: text('email') || undefined, linkedin_url: text('linkedin_url') || undefined,
+          twitter_url: text('twitter_url') || undefined, display_order: number('display_order'), is_active: checked('is_active'),
+        };
+        if (id) {
+          await teamApi.update(id, {
+            ...payload,
+            email: text('email') || null,
+            linkedin_url: text('linkedin_url') || null,
+            twitter_url: text('twitter_url') || null,
+          });
+        }
+        else await teamApi.create(payload);
+      } else if (managedEntity === 'partner') {
+        const payload = {
+          name: text('name'), logo_url: text('logo_url'), website_url: text('website_url') || undefined,
+          category: text('category'), description: text('description') || undefined,
+          is_featured: checked('is_featured'), display_order: number('display_order'),
+        };
+        if (id) {
+          await partnersApi.update(id, {
+            ...payload,
+            website_url: text('website_url') || null,
+            description: text('description') || null,
+          });
+        }
+        else await partnersApi.create(payload);
+      } else {
+        const payload = {
+          name: text('name'), role: text('role'), avatar: text('avatar'), stars: number('stars'),
+          content: text('content'), display_order: number('display_order'), is_active: checked('is_active'),
+        };
+        if (id) await testimonialsApi.update(id, payload);
+        else await testimonialsApi.create(payload);
+      }
+
+      showToast(`${managedEntity === 'booking' ? 'Booking' : managedEntity[0].toUpperCase() + managedEntity.slice(1)} saved successfully`, 'success');
+      closeManagedEditor();
+      await loadData();
+    } catch (error: any) {
+      showToast(error.response?.data?.detail || 'Could not save this record', 'error');
+    }
+  };
+
+  const handleDeleteManagedRecord = async (entity: 'booking' | 'blog' | 'offering' | 'team' | 'partner' | 'testimonial', id: string) => {
+    if (!confirm(`Are you sure you want to delete this ${entity === 'blog' ? 'article' : entity}?`)) return;
+    try {
+      if (entity === 'booking') await bookingsApi.delete(id);
+      else if (entity === 'blog') await blogApi.delete(id);
+      else if (entity === 'offering') await offeringsApi.delete(id);
+      else if (entity === 'team') await teamApi.delete(id);
+      else if (entity === 'partner') await partnersApi.delete(id);
+      else await testimonialsApi.delete(id);
+      showToast('Record deleted', 'success');
+      await loadData();
+    } catch (error: any) {
+      showToast(error.response?.data?.detail || 'Could not delete record', 'error');
+    }
+  };
+
+  const handleUpdateBookingStatus = async (id: string, newStatus: BookingRecord['status']) => {
     try {
       await bookingsApi.update(id, { status: newStatus });
       showToast(`Booking updated to ${newStatus}`, 'success');
@@ -146,17 +353,6 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const handleDeleteBlog = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this blog post?')) return;
-    try {
-      await blogApi.delete(id);
-      showToast('Article deleted', 'info');
-      loadData();
-    } catch (err) {
-      showToast('Could not delete post', 'error');
-    }
-  };
-
   const handleCheckRebac = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -167,7 +363,7 @@ export const Dashboard: React.FC = () => {
         resource_id: rebacCheckId
       });
       setRebacCheckResult(res.data);
-    } catch (err: any) {
+    } catch {
       showToast('ReBAC check failed', 'error');
     }
   };
@@ -186,7 +382,7 @@ export const Dashboard: React.FC = () => {
       setGrantEntityId('');
       setGrantObjectId('');
       loadData();
-    } catch (err) {
+    } catch {
       showToast('Could not grant tuple', 'error');
     }
   };
@@ -342,6 +538,18 @@ export const Dashboard: React.FC = () => {
           </button>
 
           <button
+            onClick={() => setActiveTab('testimonials')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'testimonials'
+                ? 'bg-[#00B87C] text-white shadow-md'
+                : 'bg-white/5 text-gray-400 hover:text-white'
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>Testimonials ({testimonials.length})</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('rebac')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
               activeTab === 'rebac'
@@ -357,6 +565,18 @@ export const Dashboard: React.FC = () => {
         {/* TAB 1: BOOKINGS & LEADS */}
         {activeTab === 'bookings' && (
           <div className="bg-[#0F1522] rounded-2xl border border-white/10 p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-lg font-bold text-white">Tour Bookings & Enquiries</h3>
+                <p className="text-xs text-gray-400">Manage tour requests, contact details, and follow-up status.</p>
+              </div>
+              <button
+                onClick={() => startManaging('booking')}
+                className="flex items-center gap-1.5 px-4 py-2 bg-[#00B87C] hover:bg-[#009F6B] text-white text-xs font-bold rounded-lg"
+              >
+                <Plus className="w-4 h-4" /> New Booking
+              </button>
+            </div>
             {/* Filter controls */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
@@ -436,7 +656,7 @@ export const Dashboard: React.FC = () => {
                           <td className="p-3.5">
                             <select
                               value={b.status}
-                              onChange={(e) => handleUpdateBookingStatus(b.id, e.target.value)}
+                              onChange={(e) => handleUpdateBookingStatus(b.id, getBookingStatus(e.target.value))}
                               className={`px-2.5 py-1 rounded text-xs font-bold border focus:outline-none cursor-pointer ${
                                 b.status === 'NEW'
                                   ? 'bg-amber-950/60 text-amber-300 border-amber-800/50'
@@ -480,6 +700,24 @@ export const Dashboard: React.FC = () => {
                               >
                                 Email
                               </a>
+                              <button
+                                type="button"
+                                onClick={() => startManaging('booking', { ...b })}
+                                aria-label={`Edit booking for ${b.full_name}`}
+                                className="p-1.5 rounded bg-white/5 hover:bg-white/10 text-gray-300"
+                              >
+                                <Edit className="w-3.5 h-3.5" />
+                              </button>
+                              {canManageContent && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteManagedRecord('booking', b.id)}
+                                  aria-label={`Delete booking for ${b.full_name}`}
+                                  className="p-1.5 rounded hover:bg-red-900/60 text-red-400"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -544,12 +782,15 @@ export const Dashboard: React.FC = () => {
                       >
                         <Edit className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        onClick={() => handleDeleteBlog(b.id)}
-                        className="p-1.5 rounded hover:bg-red-900/60 text-red-400"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      {canManageContent && (
+                        <button
+                          onClick={() => handleDeleteManagedRecord('blog', b.id)}
+                          aria-label={`Delete ${b.title}`}
+                          className="p-1.5 rounded hover:bg-red-900/60 text-red-400"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -561,14 +802,24 @@ export const Dashboard: React.FC = () => {
         {/* TAB 3: OFFERINGS & RATES */}
         {activeTab === 'offerings' && (
           <div className="bg-[#0F1522] rounded-2xl border border-white/10 p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-white mb-4">Workspace Plans & Rate Cards</h3>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-white">Workspace Plans & Rate Cards</h3>
+                <p className="text-xs text-gray-400">Create and maintain plans displayed on the offerings page.</p>
+              </div>
+              {canManageContent && (
+                <button onClick={() => startManaging('offering')} className="flex items-center gap-1.5 px-4 py-2 bg-[#00B87C] hover:bg-[#009F6B] text-white text-xs font-bold rounded-lg">
+                  <Plus className="w-4 h-4" /> Add Offering
+                </button>
+              )}
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {offerings.map((off) => (
                 <div key={off.id} className="p-5 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-bold text-white text-base">{off.name}</h4>
-                      <span className="text-xs text-[#00B87C] font-semibold">{off.shift_type}</span>
+                      <span className={`text-xs font-semibold ${off.is_active ? 'text-[#00B87C]' : 'text-gray-500'}`}>{off.is_active ? off.shift_type : 'Inactive'}</span>
                     </div>
                     <div className="text-2xl font-extrabold text-white mb-2">
                       PKR {off.price_pkr.toLocaleString()}
@@ -586,6 +837,16 @@ export const Dashboard: React.FC = () => {
                   </div>
                   <div className="mt-4 pt-3 border-t border-white/10 text-xs text-gray-400">
                     Capacity: <strong className="text-white">{off.capacity}</strong>
+                    {canManageContent && (
+                      <div className="flex justify-end gap-2 mt-3">
+                        <button onClick={() => startManaging('offering', { ...off })} className="p-1.5 rounded hover:bg-white/10 text-gray-300" aria-label={`Edit ${off.name}`}>
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleDeleteManagedRecord('offering', off.id)} className="p-1.5 rounded hover:bg-red-900/60 text-red-400" aria-label={`Delete ${off.name}`}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -597,29 +858,107 @@ export const Dashboard: React.FC = () => {
         {activeTab === 'team' && (
           <div className="space-y-8">
             <div className="bg-[#0F1522] rounded-2xl border border-white/10 p-6 shadow-xl">
-              <h3 className="text-lg font-bold text-white mb-4">Team Directory</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-white">Team Directory</h3>
+                {canManageContent && (
+                  <button onClick={() => startManaging('team')} className="flex items-center gap-1.5 px-3 py-2 bg-[#00B87C] hover:bg-[#009F6B] text-white text-xs font-bold rounded-lg">
+                    <Plus className="w-4 h-4" /> Add Team Member
+                  </button>
+                )}
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {teamMembers.map((m) => (
-                  <div key={m.id} className="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                  <div key={m.id} className={`bg-white/5 rounded-xl p-4 border border-white/10 text-center ${m.is_active === false ? 'opacity-60' : ''}`}>
                     <img src={m.photo_url} alt={m.name} className="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-[#00B87C]" />
                     <h5 className="font-bold text-white text-sm">{m.name}</h5>
                     <span className="text-[11px] text-[#00B87C] block mb-1">{m.role}</span>
                     <p className="text-[10px] text-gray-400 line-clamp-2">{m.bio}</p>
+                    {canManageContent && (
+                      <div className="flex justify-center gap-2 mt-3">
+                        <button onClick={() => startManaging('team', { ...m })} className="p-1.5 rounded hover:bg-white/10 text-gray-300" aria-label={`Edit ${m.name}`}>
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleDeleteManagedRecord('team', m.id)} className="p-1.5 rounded hover:bg-red-900/60 text-red-400" aria-label={`Delete ${m.name}`}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="bg-[#0F1522] rounded-2xl border border-white/10 p-6 shadow-xl">
-              <h3 className="text-lg font-bold text-white mb-4">Partner Brands</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-white">Partner Brands</h3>
+                {canManageContent && (
+                  <button onClick={() => startManaging('partner')} className="flex items-center gap-1.5 px-3 py-2 bg-[#00B87C] hover:bg-[#009F6B] text-white text-xs font-bold rounded-lg">
+                    <Plus className="w-4 h-4" /> Add Partner
+                  </button>
+                )}
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {partners.map((p) => (
                   <div key={p.id} className="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
                     <h5 className="font-bold text-white text-sm">{p.name}</h5>
                     <span className="text-[11px] text-gray-400">{p.category}</span>
+                    {canManageContent && (
+                      <div className="flex justify-center gap-2 mt-3">
+                        <button onClick={() => startManaging('partner', { ...p })} className="p-1.5 rounded hover:bg-white/10 text-gray-300" aria-label={`Edit ${p.name}`}>
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleDeleteManagedRecord('partner', p.id)} className="p-1.5 rounded hover:bg-red-900/60 text-red-400" aria-label={`Delete ${p.name}`}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'testimonials' && (
+          <div className="bg-[#0F1522] rounded-2xl border border-white/10 p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-bold text-white">Customer Testimonials</h3>
+                <p className="text-xs text-gray-400">Manage the reviews shown on the public homepage.</p>
+              </div>
+              {canManageContent && (
+                <button onClick={() => startManaging('testimonial')} className="flex items-center gap-1.5 px-4 py-2 bg-[#00B87C] hover:bg-[#009F6B] text-white text-xs font-bold rounded-lg">
+                  <Plus className="w-4 h-4" /> Add Testimonial
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {testimonials.map((item) => (
+                <div key={item.id} className={`bg-white/5 rounded-xl p-5 border border-white/10 ${item.is_active ? '' : 'opacity-60'}`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <img src={item.avatar} alt="" className="w-11 h-11 rounded-full object-cover" />
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-white text-sm truncate">{item.name}</h4>
+                      <p className="text-[11px] text-gray-400 truncate">{item.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-300 line-clamp-4">{item.content}</p>
+                  <div className="flex items-center justify-between mt-4">
+                    <span className="text-amber-400 text-xs">{'★'.repeat(item.stars)}{'☆'.repeat(5 - item.stars)}</span>
+                    {canManageContent && (
+                      <div className="flex gap-2">
+                        <button onClick={() => startManaging('testimonial', { ...item })} className="p-1.5 rounded hover:bg-white/10 text-gray-300" aria-label={`Edit testimonial by ${item.name}`}>
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleDeleteManagedRecord('testimonial', item.id)} className="p-1.5 rounded hover:bg-red-900/60 text-red-400" aria-label={`Delete testimonial by ${item.name}`}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {testimonials.length === 0 && <p className="text-sm text-gray-500">No testimonials found.</p>}
             </div>
           </div>
         )}
@@ -796,6 +1135,18 @@ export const Dashboard: React.FC = () => {
         )}
 
       </main>
+
+      {managedEntity && managedRecord && (
+        <AdminRecordModal
+          title={`${managedRecord.id ? 'Edit' : 'Create'} ${managedEntity === 'booking' ? 'Tour Booking' : managedEntity}`}
+          fields={managedFields}
+          values={managedRecord}
+          onChange={(field, value) => setManagedRecord((previous) => previous ? { ...previous, [field]: value } : previous)}
+          onSubmit={handleSaveManagedRecord}
+          onClose={closeManagedEditor}
+          submitLabel={managedRecord.id ? 'Save Changes' : 'Create Record'}
+        />
+      )}
 
       {/* Blog Editor Modal */}
       {isBlogModalOpen && editingPost && (

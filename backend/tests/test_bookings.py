@@ -51,9 +51,18 @@ async def test_update_booking_status(client: AsyncClient, admin_token: str):
     patch_res = await client.patch(
         f"/api/v1/bookings/{target_id}",
         headers={"Authorization": f"Bearer {admin_token}"},
-        json={"status": "TOUR_SCHEDULED", "notes": "Confirmed visit for 3 PM tomorrow"}
+        json={
+            "status": "TOUR_SCHEDULED",
+            "notes": "Confirmed visit for 3 PM tomorrow",
+            "full_name": "Updated Booking Contact",
+            "email": "updated.booking@example.com",
+            "plan_interest": "Private Office",
+        }
     )
     assert patch_res.status_code == 200
     updated = patch_res.json()
     assert updated["status"] == "TOUR_SCHEDULED"
     assert updated["notes"] == "Confirmed visit for 3 PM tomorrow"
+    assert updated["full_name"] == "Updated Booking Contact"
+    assert updated["email"] == "updated.booking@example.com"
+    assert updated["plan_interest"] == "Private Office"

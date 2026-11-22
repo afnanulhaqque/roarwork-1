@@ -15,6 +15,13 @@ class TourBookingCreate(BaseModel):
     terms_agreed: bool = True
 
 class TourBookingUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = Field(None, min_length=2, max_length=100)
+    phone: Optional[str] = None
+    booking_type: Optional[str] = None
+    plan_interest: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
     status: Optional[str] = Field(None, description="NEW, CONTACTED, TOUR_SCHEDULED, COMPLETED, CANCELLED")
     assigned_to_user_id: Optional[str] = None
     notes: Optional[str] = None

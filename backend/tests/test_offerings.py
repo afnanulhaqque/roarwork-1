@@ -33,3 +33,30 @@ async def test_get_single_offering_by_slug(client: AsyncClient):
     assert data["slug"] == "podcast-studio"
     assert data["price_pkr"] == 9000
     assert len(data["features"]) > 0
+
+@pytest.mark.asyncio
+async def test_create_and_delete_offering(client: AsyncClient, admin_token: str):
+    import uuid
+    slug = f"admin-test-{uuid.uuid4().hex[:8]}"
+    payload = {
+        "name": "Admin CRUD Test",
+        "slug": slug,
+        "description": "A test offering created to verify admin lifecycle operations.",
+        "price_pkr": 1000,
+        "billing_period": "/hour",
+        "capacity": "2 People",
+        "shift_type": "Flexible",
+        "features": ["Feature one"],
+        "is_popular": False,
+        "is_active": True,
+        "display_order": 99,
+    }
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    created = await client.post("/api/v1/offerings", headers=headers, json=payload)
+    assert created.status_code == 201
+    offering_id = created.json()["id"]
+
+    deleted = await client.delete(f"/api/v1/offerings/{offering_id}", headers=headers)
+    assert deleted.status_code == 204
+    missing = await client.get(f"/api/v1/offerings/{offering_id}")
+    assert missing.status_code == 404

@@ -11,6 +11,7 @@ from app.models.team import TeamMember
 from app.models.partner import Partner
 from app.models.booking import TourBooking
 from app.models.rebac import RebacTuple
+from app.models.testimonial import Testimonial
 from app.core.redis import delete_cache
 
 async def seed_initial_data():
@@ -230,7 +231,38 @@ At The Roarworks, many of our resident agency teams host monthly client reviews 
             db.add_all(partners)
             await db.commit()
 
-        # 7. Sample Bookings
+        # 7. Testimonials
+        testimonial_count = (await db.execute(select(Testimonial))).scalars().all()
+        if not testimonial_count:
+            db.add_all([
+                Testimonial(
+                    name="Celine Dion",
+                    role="Cafe Owner & Founder",
+                    avatar="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
+                    stars=5,
+                    content="The Roarworks gave our administrative team the focus and executive presence we needed in Islamabad. Clean spaces, great coffee, and professional conference rooms.",
+                    display_order=1
+                ),
+                Testimonial(
+                    name="Riana Madiva",
+                    role="Digital Marketer & Agency Lead",
+                    avatar="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80",
+                    stars=5,
+                    content="Working night shifts for overseas US clients used to mean constant power and internet anxiety. At Roarworks Blue Area, zero downtime and round-the-clock female-friendly security.",
+                    display_order=2
+                ),
+                Testimonial(
+                    name="John Melon",
+                    role="Freelancer & Content Creator",
+                    avatar="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+                    stars=5,
+                    content="The acoustic podcast studio with Shure SM7B mics and 4K cameras is easily the best creator setup in Islamabad. High-speed fiber makes uploading 4K video instantaneous.",
+                    display_order=3
+                )
+            ])
+            await db.commit()
+
+        # 8. Sample Bookings
         booking_count = (await db.execute(select(TourBooking))).scalars().all()
         if not booking_count:
             bookings = [

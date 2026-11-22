@@ -27,6 +27,11 @@ class MemoryCacheFallback:
             return True
         return False
 
+    async def delete_prefix(self, prefix: str) -> None:
+        for key in list(self._store):
+            if key.startswith(prefix):
+                del self._store[key]
+
     async def check_rate_limit(self, identifier: str, max_requests: int, window: int) -> bool:
         now = time.time()
         requests = self._rate_limits.get(identifier, [])
@@ -90,6 +95,17 @@ async def delete_cache(key: str) -> bool:
     except Exception:
         pass
     return await _memory_fallback.delete(key)
+
+async def delete_cache_prefix(prefix: str) -> None:
+    try:
+        client = await get_redis_client()
+        if client:
+            keys = [key async for key in client.scan_iter(match=f"{prefix}*")]
+            if keys:
+                await client.delete(*keys)
+    except Exception:
+        pass
+    await _memory_fallback.delete_prefix(prefix)
 
 async def rate_limit(identifier: str, max_requests: int = 15, window_seconds: int = 60) -> bool:
     """Return True if request is allowed, False if limit exceeded."""

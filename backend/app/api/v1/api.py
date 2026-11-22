@@ -7,6 +7,7 @@ from app.api.v1.team import router as team_router
 from app.api.v1.partners import router as partners_router
 from app.api.v1.rebac import router as rebac_router
 from app.api.v1.stats import router as stats_router
+from app.api.v1.testimonials import router as testimonials_router
 
 api_router = APIRouter()
 
@@ -18,3 +19,4 @@ api_router.include_router(team_router)
 api_router.include_router(partners_router)
 api_router.include_router(rebac_router)
 api_router.include_router(stats_router)
+api_router.include_router(testimonials_router)

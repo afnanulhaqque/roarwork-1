@@ -9,6 +9,7 @@ from app.models.team import TeamMember
 from app.models.partner import Partner
 from app.models.rebac import RebacTuple
 from app.models.audit import AuditLog
+from app.models.testimonial import Testimonial
 
 __all__ = [
     "Base",
@@ -21,5 +22,6 @@ __all__ = [
     "TeamMember",
     "Partner",
     "RebacTuple",
-    "AuditLog"
+    "AuditLog",
+    "Testimonial"
 ]

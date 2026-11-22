@@ -1,30 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
+import { testimonialsApi, TestimonialRecord } from '../services/api';
+
+const fallbackReviews: Omit<TestimonialRecord, 'id' | 'display_order' | 'is_active'>[] = [
+  {
+    name: 'Celine Dion',
+    role: 'Cafe Owner & Founder',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80',
+    stars: 5,
+    content: 'The Roarworks gave our administrative team the focus and executive presence we needed in Islamabad. Clean spaces, great coffee, and professional conference rooms.',
+  },
+  {
+    name: 'Riana Madiva',
+    role: 'Digital Marketer & Agency Lead',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
+    stars: 5,
+    content: 'Working night shifts for overseas US clients used to mean constant power and internet anxiety. At Roarworks Blue Area, zero downtime and round-the-clock female-friendly security.',
+  },
+  {
+    name: 'John Melon',
+    role: 'Freelancer & Content Creator',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    stars: 5,
+    content: 'The acoustic podcast studio with Shure SM7B mics and 4K cameras is easily the best creator setup in Islamabad. High-speed fiber makes uploading 4K video instantaneous.',
+  },
+];
 
 export const Testimonials: React.FC = () => {
-  const reviews = [
-    {
-      name: 'Celine Dion',
-      role: 'Cafe Owner & Founder',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80',
-      stars: 5,
-      content: 'The Roarworks gave our administrative team the focus and executive presence we needed in Islamabad. Clean spaces, great coffee, and professional conference rooms.',
-    },
-    {
-      name: 'Riana Madiva',
-      role: 'Digital Marketer & Agency Lead',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
-      stars: 5,
-      content: 'Working night shifts for overseas US clients used to mean constant power and internet anxiety. At Roarworks Blue Area, zero downtime and round-the-clock female-friendly security.',
-    },
-    {
-      name: 'John Melon',
-      role: 'Freelancer & Content Creator',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
-      stars: 5,
-      content: 'The acoustic podcast studio with Shure SM7B mics and 4K cameras is easily the best creator setup in Islamabad. High-speed fiber makes uploading 4K video instantaneous.',
-    },
-  ];
+  const [reviews, setReviews] = useState(fallbackReviews);
+
+  useEffect(() => {
+    testimonialsApi.list()
+      .then((response) => setReviews(response.data))
+      .catch(() => undefined);
+  }, []);
 
   return (
     <section className="py-24 bg-white">

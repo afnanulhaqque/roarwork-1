@@ -8,7 +8,7 @@ from app.core.database import get_db
 from app.models.blog import BlogPost
 from app.models.user import User
 from app.schemas.blog import BlogPostCreate, BlogPostUpdate, BlogPostResponse
-from app.api.deps import get_current_user, require_role
+from app.api.deps import get_current_user, get_optional_current_user, require_role
 from app.services.rebac_service import RebacService
 from app.services.audit_service import AuditService
 
@@ -42,8 +42,12 @@ async def list_blog_posts(
     all_posts: bool = Query(False, description="Include unpublished (admin/staff only)"),
     limit: int = Query(30, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    if all_posts and (not current_user or current_user.role not in ["super_admin", "workspace_manager", "staff"]):
+        raise HTTPException(status_code=403, detail="Admin access required to view unpublished posts")
+
     query = select(BlogPost).options(selectinload(BlogPost.author))
     conditions = []
 

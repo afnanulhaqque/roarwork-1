@@ -6,13 +6,23 @@ from app.core.database import get_db
 from app.models.team import TeamMember
 from app.models.user import User
 from app.schemas.team import TeamMemberCreate, TeamMemberUpdate, TeamMemberResponse
-from app.api.deps import require_role
+from app.api.deps import get_optional_current_user, require_role
 
 router = APIRouter(prefix="/team", tags=["Team Directory"])
 
 @router.get("", response_model=List[TeamMemberResponse])
-async def list_team_members(db: AsyncSession = Depends(get_db)):
-    stmt = select(TeamMember).where(TeamMember.is_active.is_(True)).order_by(TeamMember.display_order.asc())
+async def list_team_members(
+    include_inactive: bool = False,
+    current_user: User | None = Depends(get_optional_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    if include_inactive and (not current_user or current_user.role not in ["super_admin", "workspace_manager"]):
+        raise HTTPException(status_code=403, detail="Admin access required to view inactive team members")
+
+    stmt = select(TeamMember)
+    if not include_inactive:
+        stmt = stmt.where(TeamMember.is_active.is_(True))
+    stmt = stmt.order_by(TeamMember.display_order.asc())
     res = await db.execute(stmt)
     return list(res.scalars().all())
 
