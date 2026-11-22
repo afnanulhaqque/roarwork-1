@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { bookingsApi } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import {
@@ -32,8 +33,9 @@ const availableTourTimes = Array.from({ length: 11 }, (_, index) => {
 type TourFormField = 'fullName' | 'email' | 'startDate' | 'endDate' | 'preferredTime' | 'terms';
 type TourFormErrors = Partial<Record<TourFormField, string>>;
 
-export const TourBookingWidget: React.FC = () => {
+export const TourBookingWidget: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
   const { showToast } = useToast();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -46,6 +48,13 @@ export const TourBookingWidget: React.FC = () => {
   const [agreed, setAgreed] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [whatsappLink, setWhatsappLink] = useState<string | null>(null);
+
+  useEffect(() => {
+    const planParam = new URLSearchParams(location.search).get('plan');
+    if (planParam) {
+      setPlanInterest(planParam);
+    }
+  }, [location.search]);
 
   const clearError = (field: TourFormField) => {
     setFormErrors((current) => {
@@ -123,10 +132,10 @@ export const TourBookingWidget: React.FC = () => {
   };
 
   return (
-    <section id="book-tour" className="bg-white py-16 sm:py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="grid items-start gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20">
-          <div className="pt-2 text-gray-900 lg:sticky lg:top-28">
+    <section id="book-tour" className={embedded ? 'w-full' : 'bg-white py-16 sm:py-24'}>
+      <div className={`mx-auto ${embedded ? 'max-w-none' : 'max-w-6xl px-4 sm:px-6 lg:px-8'}`}>
+        <div className={`grid items-start gap-10 ${embedded ? 'grid-cols-1' : 'lg:grid-cols-[0.72fr_1.28fr] lg:gap-20'}`}>
+          {!embedded && <div className="pt-2 text-gray-900 lg:sticky lg:top-28">
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#008b60]">
               Visit The Roarworks
             </p>
@@ -146,7 +155,7 @@ export const TourBookingWidget: React.FC = () => {
                 Tours available 9:00 AM – 7:00 PM
               </p>
             </div>
-          </div>
+          </div>}
 
           <div className="w-full rounded-2xl border border-gray-200 bg-white p-5 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.3)] sm:p-8 lg:p-9">
             <div className="mb-7 border-b border-gray-100 pb-5">

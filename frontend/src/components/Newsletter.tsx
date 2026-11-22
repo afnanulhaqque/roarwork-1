@@ -19,15 +19,15 @@ export const Newsletter: React.FC = () => {
   };
 
   return (
-    <section id="newsletter" className="py-24 bg-white">
+    <section id="newsletter" className="py-24 bg-[#0B0F19]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Heading matching Design.png */}
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-3">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
           Subs To News Letter
         </h2>
 
         {/* Subtitle matching Design.png */}
-        <p className="text-xs sm:text-sm text-gray-500 max-w-lg mx-auto leading-relaxed mb-8">
+        <p className="text-xs sm:text-sm text-gray-400 max-w-lg mx-auto leading-relaxed mb-8">
           Stay connected with Blue Area coworking community happenings, podcast studio feature releases, and exclusive workspace deals.
         </p>
 
@@ -46,7 +46,7 @@ export const Newsletter: React.FC = () => {
                 placeholder="Email Address..."
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full sm:flex-1 px-5 py-3.5 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B87C] focus:border-transparent"
+                className="w-full sm:flex-1 px-5 py-3.5 rounded-md border border-white/20 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B87C] focus:border-transparent"
               />
               <button
                 type="submit"

@@ -51,12 +51,12 @@ export const SpaceOverview: React.FC = () => {
   };
 
   return (
-    <section className="py-24 bg-white overflow-hidden">
+    <section className="py-24 bg-[#0B0F19] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12">
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-3">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
           Space Overview
         </h2>
-        <p className="text-xs sm:text-sm text-gray-500 max-w-xl mx-auto leading-relaxed">
+        <p className="text-xs sm:text-sm text-gray-400 max-w-xl mx-auto leading-relaxed">
           Take a look inside our modern facilities designed to elevate your work, meetings, and digital media production.
         </p>
       </div>
@@ -101,7 +101,7 @@ export const SpaceOverview: React.FC = () => {
           <h3 className="text-2xl sm:text-3xl font-extrabold text-[#00B87C] tracking-tight">
             {rooms[activeIndex].title}
           </h3>
-          <p className="text-sm text-gray-600 max-w-md mx-auto mt-2">
+          <p className="text-sm text-gray-300 max-w-md mx-auto mt-2">
             {rooms[activeIndex].description}
           </p>
 
@@ -109,7 +109,7 @@ export const SpaceOverview: React.FC = () => {
           <div className="flex items-center justify-center gap-4 mt-6">
             <button
               onClick={handlePrev}
-              className="p-3 rounded-full bg-gray-100 hover:bg-[#00B87C] hover:text-white text-gray-700 transition-colors shadow-sm"
+              className="p-3 rounded-full bg-white/10 hover:bg-[#00B87C] hover:text-white text-gray-200 transition-colors shadow-sm"
               aria-label="Previous space"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -120,7 +120,7 @@ export const SpaceOverview: React.FC = () => {
                   key={i}
                   onClick={() => setActiveIndex(i)}
                   className={`h-2 rounded-full transition-all ${
-                    i === activeIndex ? 'w-8 bg-[#00B87C]' : 'w-2 bg-gray-300'
+                    i === activeIndex ? 'w-8 bg-[#00B87C]' : 'w-2 bg-gray-600'
                   }`}
                   aria-label={`Slide ${i + 1}`}
                 />
@@ -128,7 +128,7 @@ export const SpaceOverview: React.FC = () => {
             </div>
             <button
               onClick={handleNext}
-              className="p-3 rounded-full bg-gray-100 hover:bg-[#00B87C] hover:text-white text-gray-700 transition-colors shadow-sm"
+              className="p-3 rounded-full bg-white/10 hover:bg-[#00B87C] hover:text-white text-gray-200 transition-colors shadow-sm"
               aria-label="Next space"
             >
               <ChevronRight className="w-5 h-5" />

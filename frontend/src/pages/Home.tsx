@@ -1,7 +1,6 @@
 import React from 'react';
 import { Hero } from '../components/Hero';
 import { FeaturesCollage } from '../components/FeaturesCollage';
-import { TourBookingWidget } from '../components/TourBookingWidget';
 import { Testimonials } from '../components/Testimonials';
 import { SpaceOverview } from '../components/SpaceOverview';
 import { BlogPreview } from '../components/BlogPreview';
@@ -15,7 +14,6 @@ export const Home: React.FC = () => {
       <Hero />
       <HomeAbout />
       <FeaturesCollage />
-      <TourBookingWidget />
       <Testimonials />
       <SpaceOverview />
       <BlogPreview />
