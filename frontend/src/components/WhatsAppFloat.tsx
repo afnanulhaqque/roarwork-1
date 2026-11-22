@@ -6,7 +6,7 @@ export const WhatsAppFloat: React.FC = () => {
   const waUrl = "https://wa.me/923275277725?text=Hello%20The%20Roarworks%20Team!%20I%20have%20an%20inquiry%20regarding%20coworking%20space%20at%20Blue%20Area%20Islamabad.";
 
   return (
-    <div className="fixed bottom-6 left-6 z-40 flex items-center gap-3">
+    <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3">
       {/* Quick Tooltip Bubble */}
       {showTooltip && (
         <div className="hidden sm:flex items-center gap-2 bg-[#0B0F19] text-white text-xs py-2 px-3.5 rounded-full shadow-xl border border-white/10 animate-fade-in">

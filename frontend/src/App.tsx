@@ -42,6 +42,20 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
 
+  React.useLayoutEffect(() => {
+    const targetId = location.hash.slice(1);
+    const target = targetId ? document.getElementById(targetId) : null;
+
+    if (target) {
+      const header = document.querySelector('header');
+      const headerHeight = header?.getBoundingClientRect().height ?? 0;
+      const targetTop = window.scrollY + target.getBoundingClientRect().top - headerHeight;
+      window.scrollTo({ top: Math.max(targetTop, 0), left: 0, behavior: 'auto' });
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+  }, [location.hash, location.key, location.pathname]);
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {!isAdminRoute && <Navbar />}

@@ -29,7 +29,7 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-[#050811] text-gray-400 pt-16 pb-12 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12 pb-12 border-b border-white/10 text-sm">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 pb-12 border-b border-white/10 text-sm">
           {/* Column 1: FEATURE */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-5">
@@ -96,35 +96,14 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <a href="#newsletter" className="hover:text-white transition-colors">
+                <Link to="/#newsletter" className="hover:text-white transition-colors">
                   Community Newsletter
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 3: COMMUNITY */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-5">
-              Community
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <a href="https://www.linkedin.com/company/theroarworks/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-white transition-colors">
-                  <LinkedinIcon className="w-4 h-4" />
-                  LinkedIn Network
-                </a>
-              </li>
-              <li>
-                <a href="https://www.instagram.com/theroarworks/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-white transition-colors">
-                  <InstagramIcon className="w-4 h-4" />
-                  Instagram @theroarworks
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 4: SUPPORT */}
+          {/* Column 3: SUPPORT */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-5">
               Support
@@ -148,7 +127,7 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Column 5: COMPANY */}
+          {/* Column 4: COMPANY */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-5">
               Company
