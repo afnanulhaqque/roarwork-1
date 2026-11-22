@@ -145,22 +145,6 @@ export const Footer: React.FC = () => {
                   Metro Transit Access
                 </Link>
               </li>
-              <li>
-                <span className="text-xs text-gray-500 block">
-                  Phone:
-                </span>
-                <a href="tel:+923275277725" className="text-white hover:text-[#00B87C] transition-colors font-semibold">
-                  +92 327 527 7725
-                </a>
-              </li>
-              <li>
-                <span className="text-xs text-gray-500 block">
-                  Email:
-                </span>
-                <a href="mailto:info@theroarworks.com" className="text-white hover:text-[#00B87C] transition-colors font-semibold break-all">
-                  info@theroarworks.com
-                </a>
-              </li>
             </ul>
           </div>
 
